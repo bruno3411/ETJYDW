@@ -122,6 +122,13 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
 .g4{display:grid;grid-template-columns:120px 1fr 100px 1fr;gap:4px;align-items:center;margin-top:3px;}
 .g2{display:grid;grid-template-columns:120px 1fr;gap:4px;align-items:center;margin-top:3px;}
 .rl{text-align:right;white-space:nowrap;}
+/* TABS */
+.ctab{padding:3px 10px 2px;font-size:11px;cursor:pointer;background:#bdb9b0;border:2px solid;border-color:#fff #808080 #808080 #fff;border-bottom:none;margin-right:2px;position:relative;top:1px;white-space:nowrap;user-select:none;}
+.ctab:hover{background:#ccc9c0;}
+.ctab.active{background:#d4d0c8;border-color:#fff #808080 #d4d0c8 #fff;font-weight:bold;z-index:2;padding-top:4px;}
+.ctab-body{border:2px solid;border-color:#808080 #fff #fff #808080;background:#d4d0c8;padding:6px;position:relative;z-index:1;}
+.ctab-panel{display:none;}
+.ctab-panel.active{display:block;}
 </style>
 </head>
 <body>
@@ -250,72 +257,85 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
         </div>
       </fieldset>
 
-      <!-- ATTEIKT -->
-      <fieldset class="g">
-        <legend>Iesnieguma apstrāde</legend>
-        <div style="padding:4px 0;">
-          <label class="fl" style="gap:6px;cursor:pointer;">
-            <input type="checkbox" id="atteiktChk" onchange="toggleAtteikt()">
-            <span style="color:#880000;font-weight:bold;">Atteikt iesniegumu</span>
-          </label>
+      <!-- TABS -->
+      <div id="cTabsBlock">
+        <!-- Tab buttons row -->
+        <div style="display:flex;align-items:flex-end;gap:0;margin-bottom:0;padding-left:2px;">
+          <div class="ctab active" id="ctab_atteikt" onclick="switchCTab('atteikt')">Atteikt iesniegumu</div>
+          <div class="ctab" id="ctab_docs" onclick="switchCTab('docs')">Iesniegumam pievienotie dokumenti</div>
+          <div class="ctab" id="ctab_resp" onclick="switchCTab('resp')">Sagatavotās atbildes</div>
         </div>
-        <div class="atts" id="atteiktSection">
-          <div class="g2" style="margin-top:0;">
-            <span class="rl" style="color:#880000;font-weight:bold;">Atteikuma iemesls</span>
-            <select class="ws" id="atteiktReason" style="width:100%;" onchange="fillTiesiskais()">
-              <option value="">— Izvēlieties iemeslu —</option>
-              <option value="nav_apdros" data-law="EK Regula Nr. 883/2004, 12. pants — Norīkotie darbinieki">Persona nav sociāli apdrošināta Latvijā norīkojuma laikā</option>
-              <option value="pagajuse" data-law="Administratīvā procesa likums, 66. pants — Iesnieguma noraidīšana">Iesniegums iesniegts par jau pagājušu periodu</option>
-              <option value="nav_reg" data-law="Sociālās apdrošināšanas likums, 7. pants — Darba devēja pienākumi">Darba devējs nav reģistrēts kā darba devējs VSAA</option>
-              <option value="vienlaicigi" data-law="EK Regula Nr. 883/2004, 13. pants — Darbība divās vai vairākās dalībvalstīs">Persona vienlaicīgi strādā mērķa dalībvalstī</option>
-              <option value="24men" data-law="EK Regula Nr. 883/2004, 12. panta 1. punkts — 24 mēnešu ierobežojums">Periods pārsniedz 24 mēnešus</option>
-              <option value="bez_dokum" data-law="EK Regula Nr. 987/2009, 19. pants — Informācijas sniegšana">Trūkst obligāto dokumentu</option>
-              <option value="neatbilst" data-law="EK Regula Nr. 883/2004 — Vispārīgie nosacījumi">Neatbilstība EK Regulas 883/2004 nosacījumiem</option>
-              <option value="cits" data-law="VSAA likums, 23. pants — Lēmumu pieņemšana">Cits iemesls</option>
-            </select>
-          </div>
-          <div class="g2" style="margin-top:4px;">
-            <span class="rl">Tiesiskais pamatojums</span>
-            <input class="wi" id="tiesiskaisInput" style="width:100%;" placeholder="Tiek aizpildīts automātiski...">
-          </div>
-          <div class="g2" style="margin-top:4px;">
-            <span class="rl" style="padding-top:3px;">Komentārs</span>
-            <textarea class="wta" rows="2" style="width:100%;" placeholder="Papildu paskaidrojums..."></textarea>
-          </div>
-          <div style="margin-top:6px;padding-top:4px;border-top:1px solid #cc8888;">
-            <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" checked> Nosūtīt atteikuma paziņojumu iesniedzējam</label>
-            <label class="fl" style="gap:5px;cursor:pointer;margin-top:3px;"><input type="checkbox"> Ģenerēt atteikuma dokumentu (.docx)</label>
-          </div>
-        </div>
-      </fieldset>
+        <!-- Tab body -->
+        <div class="ctab-body">
 
-      <!-- DOCS -->
-      <fieldset class="g">
-        <legend>Iesniegumam pievienotie dokumenti</legend>
-        <table class="wt" id="cDocsTable"><thead><tr>
-          <th style="width:200px;">Faila nosaukums</th><th style="width:70px;">Izmērs</th>
-          <th>Apraksts</th><th style="width:90px;">Pievienots</th>
-        </tr></thead><tbody id="cDocsTbody"></tbody></table>
-        <div style="display:flex;gap:4px;margin-top:4px;">
-          <button class="btn" onclick="viewDocument()">Apskatīt dokumentu</button>
-        </div>
-      </fieldset>
+          <!-- TAB: Atteikt -->
+          <div class="ctab-panel active" id="cpanel_atteikt">
+            <div style="padding:4px 0 6px;">
+              <label class="fl" style="gap:6px;cursor:pointer;">
+                <input type="checkbox" id="atteiktChk" onchange="toggleAtteikt()">
+                <span style="color:#880000;font-weight:bold;">Atteikt iesniegumu</span>
+              </label>
+            </div>
+            <div class="atts" id="atteiktSection">
+              <div class="g2" style="margin-top:0;">
+                <span class="rl" style="color:#880000;font-weight:bold;">Atteikuma iemesls</span>
+                <select class="ws" id="atteiktReason" style="width:100%;" onchange="fillTiesiskais()">
+                  <option value="">— Izvēlieties iemeslu —</option>
+                  <option value="nav_apdros" data-law="EK Regula Nr. 883/2004, 12. pants — Norīkotie darbinieki">Persona nav sociāli apdrošināta Latvijā norīkojuma laikā</option>
+                  <option value="pagajuse" data-law="Administratīvā procesa likums, 66. pants — Iesnieguma noraidīšana">Iesniegums iesniegts par jau pagājušu periodu</option>
+                  <option value="nav_reg" data-law="Sociālās apdrošināšanas likums, 7. pants — Darba devēja pienākumi">Darba devējs nav reģistrēts kā darba devējs VSAA</option>
+                  <option value="vienlaicigi" data-law="EK Regula Nr. 883/2004, 13. pants — Darbība divās vai vairākās dalībvalstīs">Persona vienlaicīgi strādā mērķa dalībvalstī</option>
+                  <option value="24men" data-law="EK Regula Nr. 883/2004, 12. panta 1. punkts — 24 mēnešu ierobežojums">Periods pārsniedz 24 mēnešus</option>
+                  <option value="bez_dokum" data-law="EK Regula Nr. 987/2009, 19. pants — Informācijas sniegšana">Trūkst obligāto dokumentu</option>
+                  <option value="neatbilst" data-law="EK Regula Nr. 883/2004 — Vispārīgie nosacījumi">Neatbilstība EK Regulas 883/2004 nosacījumiem</option>
+                  <option value="cits" data-law="VSAA likums, 23. pants — Lēmumu pieņemšana">Cits iemesls</option>
+                </select>
+              </div>
+              <div class="g2" style="margin-top:4px;">
+                <span class="rl">Tiesiskais pamatojums</span>
+                <input class="wi" id="tiesiskaisInput" style="width:100%;" placeholder="Tiek aizpildīts automātiski...">
+              </div>
+              <div class="g2" style="margin-top:4px;">
+                <span class="rl" style="padding-top:3px;">Komentārs</span>
+                <textarea class="wta" rows="2" style="width:100%;" placeholder="Papildu paskaidrojums..."></textarea>
+              </div>
+              <div style="margin-top:6px;padding-top:4px;border-top:1px solid #cc8888;">
+                <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" checked> Nosūtīt atteikuma paziņojumu iesniedzējam</label>
+                <label class="fl" style="gap:5px;cursor:pointer;margin-top:3px;"><input type="checkbox"> Ģenerēt atteikuma dokumentu (.docx)</label>
+              </div>
+            </div>
+          </div>
 
-      <!-- RESPONSES -->
-      <fieldset class="g">
-        <legend>Sagatavotās atbildes</legend>
-        <table class="wt" id="cRespTable"><thead><tr>
-          <th style="width:18px;"></th>
-          <th style="width:130px;">Sagatavošanas datums</th>
-          <th style="width:140px;">Reģistrācijas numurs</th>
-          <th>Atbildes dokumenta veids</th>
-          <th style="width:120px;">Nosūtīšanas veids</th>
-          <th style="width:110px;">Nosūtīšanas datums</th>
-        </tr></thead><tbody id="cRespTbody"></tbody></table>
-        <div style="display:flex;gap:4px;margin-top:4px;">
-          <button class="btn" onclick="viewSelectedResp('c')">Apskatīt atbildi</button>
+          <!-- TAB: Dokumenti -->
+          <div class="ctab-panel" id="cpanel_docs">
+            <table class="wt"><thead><tr>
+              <th style="width:200px;">Faila nosaukums</th>
+              <th style="width:70px;">Izmērs</th>
+              <th>Apraksts</th>
+              <th style="width:90px;">Pievienots</th>
+            </tr></thead><tbody id="cDocsTbody"></tbody></table>
+            <div style="display:flex;gap:4px;margin-top:6px;">
+              <button class="btn" onclick="viewDocument()">Apskatīt dokumentu</button>
+            </div>
+          </div>
+
+          <!-- TAB: Atbildes -->
+          <div class="ctab-panel" id="cpanel_resp">
+            <table class="wt"><thead><tr>
+              <th style="width:18px;"></th>
+              <th style="width:130px;">Sagatavošanas datums</th>
+              <th style="width:140px;">Reģistrācijas numurs</th>
+              <th>Atbildes dokumenta veids</th>
+              <th style="width:120px;">Nosūtīšanas veids</th>
+              <th style="width:110px;">Nosūtīšanas datums</th>
+            </tr></thead><tbody id="cRespTbody"></tbody></table>
+            <div style="display:flex;gap:4px;margin-top:6px;">
+              <button class="btn" onclick="viewSelectedResp('c')">Apskatīt atbildi</button>
+            </div>
+          </div>
+
         </div>
-      </fieldset>
+      </div>
 
     </div>
 
@@ -648,7 +668,14 @@ function onSelectPerson(app,p){
   document.getElementById('statusSel').textContent=p.kods;
 }
 
-// ======= INSPECTORS =======
+// ======= TABS =======
+function switchCTab(name){
+  ['atteikt','docs','resp'].forEach(function(t){
+    document.getElementById('ctab_'+t).className='ctab'+(t===name?' active':'');
+    document.getElementById('cpanel_'+t).className='ctab-panel'+(t===name?' active':'');
+  });
+}
+
 function renderInspectorCheckboxes(app){
   var div=document.getElementById('inspCheckboxes');
   if(!div)return;
