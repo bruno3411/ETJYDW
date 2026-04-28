@@ -240,26 +240,31 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
       <!-- INSPECTORS -->
       <fieldset class="g">
         <legend>Inspektoru piešķiršana</legend>
-        <div style="display:flex;gap:10px;align-items:flex-start;margin-top:4px;">
+        <div style="margin-top:4px;">
 
-          <!-- Left: inspector search + assigned list -->
-          <div style="min-width:200px;max-width:200px;">
-            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:3px;">Pievienot inspektoru:</div>
-            <input class="wi" id="inspSearchInput" style="width:100%;font-size:10px;" placeholder="Vārds, uzvārds..." oninput="filterInspDB()">
-            <div id="inspDBList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;max-height:80px;overflow-y:auto;font-size:10px;margin-top:2px;margin-bottom:5px;"></div>
-            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:2px;">Inspektori:</div>
-            <div id="assignedInspList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;min-height:36px;max-height:80px;overflow-y:auto;font-size:11px;"></div>
-            <button class="btn sm" onclick="autoDistribute()" style="width:100%;margin-top:4px;">&#9654; Sadalīt automātiski</button>
+          <!-- Row 1: inspector selector + auto button -->
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:11px;white-space:nowrap;">Pievienot:</span>
+            <select class="ws" id="inspAddSelect" style="flex:1;min-width:180px;max-width:260px;font-size:11px;height:22px;">
+              <option value="">— Izvēlieties inspektoru —</option>
+            </select>
+            <button class="btn sm" onclick="addInspectorFromSelect()" style="white-space:nowrap;">+ Pievienot</button>
+            <button class="btn sm" onclick="autoDistribute()" style="white-space:nowrap;margin-left:auto;">&#9654; Sadalīt automātiski</button>
           </div>
 
-          <!-- Right: scrollable person list with checkboxes per inspector -->
-          <div style="flex:1;">
-            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:3px;">Personas — piešķirt inspektoram:</div>
-            <div id="inspPersonList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;max-height:180px;overflow-y:auto;">
-              <!-- filled by JS -->
-            </div>
-            <div style="font-size:10px;color:#888;margin-top:3px;" id="inspNote"></div>
-          </div>
+          <!-- Row 2: person table with inspector dropdowns -->
+          <table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:11px;" id="inspPersonTable">
+            <thead>
+              <tr style="background:#d4d0c8;border-bottom:1px solid #808080;">
+                <th style="padding:2px 5px;text-align:left;font-weight:normal;width:14px;"></th>
+                <th style="padding:2px 5px;text-align:left;font-weight:normal;">Persona</th>
+                <th style="padding:2px 5px;text-align:left;font-weight:normal;width:170px;">Inspektors</th>
+                <th style="padding:2px 5px;text-align:center;font-weight:normal;width:60px;">Statuss</th>
+              </tr>
+            </thead>
+            <tbody id="inspPersonList"></tbody>
+          </table>
+          <div style="font-size:10px;color:#888;margin-top:3px;" id="inspNote"></div>
         </div>
       </fieldset>
 
@@ -911,51 +916,34 @@ function switchCTab(name){
 }
 
 // ======= INSPECTOR DB =======
-function filterInspDB(){
-  var q=(document.getElementById('inspSearchInput')||{}).value||'';
-  q=q.toLowerCase();
-  var box=document.getElementById('inspDBList');
-  if(!box)return;
-  var sel=selApp?selApp.selectedInspectors||[]:[];
-  var results=INSP_DB.filter(function(i){return i.name.toLowerCase().indexOf(q)!==-1&&sel.indexOf(i.short)===-1;});
-  if(!q&&!results.length){box.innerHTML='<div style="padding:3px 5px;color:#999;font-style:italic;font-size:10px;">Ierakstiet vārdu meklēšanai...</div>';return;}
-  if(!results.length){box.innerHTML='<div style="padding:3px 5px;color:#999;font-size:10px;">Nav atrasts</div>';return;}
-  box.innerHTML=results.map(function(i){
-    return '<div onclick="addInspector(\''+i.short+'\',\''+i.name+'\')" '+
-      'style="padding:3px 6px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:10px;" '+
-      'onmouseover="this.style.background=\'#316ac5\';this.style.color=\'#fff\'" '+
-      'onmouseout="this.style.background=\'\';this.style.color=\'\'">'+i.name+'</div>';
-  }).join('');
+function populateInspAddSelect(){
+  var sel=document.getElementById('inspAddSelect');
+  if(!sel||!selApp)return;
+  var assigned=selApp.selectedInspectors||[];
+  sel.innerHTML='<option value="">— Izvēlieties inspektoru —</option>';
+  INSP_DB.forEach(function(i){
+    if(assigned.indexOf(i.short)===-1){
+      var o=document.createElement('option');
+      o.value=i.short;o.textContent=i.name;
+      sel.appendChild(o);
+    }
+  });
 }
 
-function addInspector(short,full){
+function addInspectorFromSelect(){
   if(!selApp)return;
+  var sel=document.getElementById('inspAddSelect');
+  var val=sel.value;if(!val)return;
   if(!selApp.selectedInspectors)selApp.selectedInspectors=[];
-  if(selApp.selectedInspectors.indexOf(short)!==-1)return;
-  selApp.selectedInspectors.push(short);
-  document.getElementById('inspSearchInput').value='';
-  renderAssignedInspList();
-  filterInspDB();
-  renderInspTable(selApp);
+  if(selApp.selectedInspectors.indexOf(val)===-1)selApp.selectedInspectors.push(val);
+  populateInspAddSelect();renderInspTable(selApp);
 }
 
 function removeInspector(short){
   if(!selApp||!selApp.selectedInspectors)return;
   selApp.selectedInspectors=selApp.selectedInspectors.filter(function(s){return s!==short;});
   selApp.persons.forEach(function(p){if(p.inspector===short)p.inspector='';});
-  renderAssignedInspList();filterInspDB();renderInspTable(selApp);renderList();
-}
-
-function renderAssignedInspList(){
-  var box=document.getElementById('assignedInspList');
-  if(!box||!selApp)return;
-  var sel=selApp.selectedInspectors||[];
-  if(!sel.length){box.innerHTML='<div style="padding:4px 6px;color:#999;font-style:italic;font-size:10px;">Nav pievienotu inspektoru</div>';return;}
-  box.innerHTML=sel.map(function(s){
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:2px 5px;border-bottom:1px solid #f0f0f0;font-size:10px;">'+
-      '<span>'+s+'</span>'+
-      '<span onclick="removeInspector(\''+s+'\')" style="cursor:pointer;color:#880000;font-weight:bold;padding:0 3px;" title="Noņemt">✕</span></div>';
-  }).join('');
+  populateInspAddSelect();renderInspTable(selApp);renderList();
 }
 
 function renderInspectors(app){
@@ -963,66 +951,67 @@ function renderInspectors(app){
     var used={};app.persons.forEach(function(p){if(p.inspector)used[p.inspector]=true;});
     app.selectedInspectors=Object.keys(used);
   }
-  var si=document.getElementById('inspSearchInput');if(si)si.value='';
-  filterInspDB();renderAssignedInspList();renderInspTable(app);
+  populateInspAddSelect();renderInspTable(app);
 }
 
 function autoDistribute(){
   if(!selApp||!selApp.persons.length){showNotif('Nav personu','Iesniegumam nav pievienotu personu.');return;}
   var sel=selApp.selectedInspectors||[];
-  if(!sel.length){showNotif('Nav inspektoru','Lūdzu pievienojiet vismaz vienu inspektoru.');return;}
-  // Only distribute persons with status 'new' or 'proc'
+  if(!sel.length){showNotif('Nav inspektoru','Pievienojiet inspektoru ar "Pievienot" pogu.');return;}
   var eligible=selApp.persons.filter(function(p){return p.status==='new'||p.status==='proc';});
   if(!eligible.length){showNotif('Nav neapstrādātu personu','Visas personas ir jau apstiprinātas vai noraidītas.');return;}
-  // Clear inspectors only for eligible persons
   eligible.forEach(function(p){p.inspector='';});
   eligible.forEach(function(p,i){p.inspector=sel[i%sel.length];});
   renderInspTable(selApp);renderList();
-  showNotif('✔ Sadalīts',eligible.length+' neapstrādātas personas sadalītas starp '+sel.length+' inspektoru(-iem). Jau apstrādātas — nemainītas.');
+  showNotif('Sadalīts',eligible.length+' personas sadalītas starp '+sel.length+' inspektoru(-iem).');
 }
 
 function renderInspTable(app){
-  var pl=document.getElementById('inspPersonList');
-  if(!pl)return;
+  var tb=document.getElementById('inspPersonList');
+  if(!tb)return;
   var sel=app.selectedInspectors||[];
   if(!app.persons.length){
-    pl.innerHTML='<div style="padding:6px;color:#999;font-style:italic;font-size:10px;">Nav personu šajā iesniegumā.</div>';
+    tb.innerHTML='<tr><td colspan="4" style="padding:6px;color:#999;font-style:italic;">Nav personu.</td></tr>';
     if(document.getElementById('inspNote'))document.getElementById('inspNote').textContent='';
     return;
   }
-  pl.innerHTML=app.persons.map(function(p,i){
+  tb.innerHTML=app.persons.map(function(p,i){
     var opts=sel.map(function(s){
       return '<option value="'+s+'"'+(p.inspector===s?' selected':'')+'>'+s+'</option>';
     }).join('');
-    return '<div style="display:grid;grid-template-columns:14px 1fr 170px;align-items:center;gap:5px;padding:3px 5px;border-bottom:1px solid #f0f0f0;background:'+(i%2?'#f8f8f8':'#fff')+';">'+
-      '<span class="sd '+sDot[p.status]+'" style="width:9px;height:9px;flex-shrink:0;"></span>'+
-      '<span style="font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+p.kods+' '+p.name+'">'+p.kods+' '+p.name+'</span>'+
-      (sel.length?
-        '<select class="ws" style="font-size:10px;height:18px;width:100%;" onchange="setPersonInspector(\''+p.kods+'\',this.value)">'+
-          '<option value="">— Nav —</option>'+opts+
-        '</select>'
-        :'<span style="font-size:10px;color:#999;font-style:italic;">Pievienojiet inspektoru</span>')+
-      '</div>';
+    var bg=i%2?'background:#f8f8f8;':'';
+    return '<tr style="'+bg+'border-bottom:1px solid #efefef;">'+
+      '<td style="padding:2px 4px;text-align:center;"><span class="sd '+sDot[p.status]+'" style="width:9px;height:9px;display:inline-block;"></span></td>'+
+      '<td style="padding:2px 5px;font-size:11px;">'+p.kods+' '+p.name+'</td>'+
+      '<td style="padding:2px 4px;">'+
+        (sel.length
+          ? '<select class="ws" style="font-size:10px;height:20px;width:160px;" onchange="setPersonInspector('' +p.kods+ '',this.value)">'+
+              '<option value="">— Nav piešķirts —</option>'+opts+
+            '</select>'
+          : '<span style="font-size:10px;color:#aaa;font-style:italic;">Pievienojiet inspektoru</span>')+
+      '</td>'+
+      '<td style="padding:2px 4px;text-align:center;"><span class="badge '+sBadge[p.status]+'" style="font-size:9px;padding:0 4px;">'+sLbl[p.status]+'</span></td>'+
+      '</tr>';
   }).join('');
   var unproc=app.persons.filter(function(p){return !p.inspector;}).length;
-  if(document.getElementById('inspNote'))document.getElementById('inspNote').textContent=
-    'Kopā: '+app.persons.length+' personas. Piešķirtas: '+(app.persons.length-unproc)+'. Nepiešķirtas: '+unproc+'.';
+  var note=document.getElementById('inspNote');
+  if(note)note.textContent='Piešķirtas: '+(app.persons.length-unproc)+' / '+app.persons.length+'.';
 }
 
 function setPersonInspector(kods,inspVal){
   if(!selApp)return;
   var p=selApp.persons.find(function(pp){return pp.kods===kods;});
-  if(p){p.inspector=inspVal;renderList();}
+  if(p)p.inspector=inspVal;
+  renderList();
   var unproc=selApp.persons.filter(function(pp){return !pp.inspector;}).length;
   var note=document.getElementById('inspNote');
-  if(note)note.textContent='Kopā: '+selApp.persons.length+' personas. Piešķirtas: '+(selApp.persons.length-unproc)+'. Nepiešķirtas: '+unproc+'.';
+  if(note)note.textContent='Piešķirtas: '+(selApp.persons.length-unproc)+' / '+selApp.persons.length+'.';
 }
 
 function assignInspector(){
   if(!selPerson)return;
   selPerson.inspector=document.getElementById('pInspector').value;
   renderList();if(selApp)renderInspTable(selApp);
-  // Also refresh person inspector dropdown to match DB
   populatePersonInspDropdown();
 }
 
