@@ -199,6 +199,14 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <span class="rl">Kontaktpersona</span><input class="wi ro" id="cKontakts" style="width:100%;" readonly>
           <span class="rl">E-pasts</span><input class="wi ro" id="cEpasts" readonly>
         </div>
+        <div style="margin-top:5px;padding-top:5px;border-top:1px solid #c0bdb5;display:flex;flex-wrap:wrap;gap:10px;">
+          <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" id="chkElPasts" checked> Elektroniskais pasts</label>
+          <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" id="chkPasts"> Pasta sūtījums</label>
+          <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" id="chkPortals"> Portāls latvija.lv</label>
+          <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" id="chkFakss"> Fakss</label>
+          <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" id="chkKlatiene"> Klātiene</label>
+          <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" id="chkTelefons"> Telefons</label>
+        </div>
       </fieldset>
 
       <fieldset class="g">
@@ -232,18 +240,28 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
       <!-- INSPECTORS -->
       <fieldset class="g">
         <legend>Inspektoru piešķiršana</legend>
-        <div style="display:flex;gap:16px;align-items:flex-start;margin-top:4px;">
-          <!-- Left: inspector checkboxes -->
-          <div style="min-width:180px;">
-            <div style="font-size:10px;color:#444;margin-bottom:4px;font-weight:bold;">Izvēlieties inspektorus:</div>
-            <div id="inspCheckboxes"></div>
-            <div style="margin-top:6px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;margin-top:4px;">
+
+          <!-- Left: add inspector -->
+          <div style="min-width:220px;max-width:220px;">
+            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:4px;">Pievienot inspektoru:</div>
+            <div style="display:flex;gap:3px;margin-bottom:4px;">
+              <input class="wi" id="inspSearchInput" style="flex:1;font-size:10px;" placeholder="Vārds, uzvārds..." oninput="filterInspDB()">
+            </div>
+            <!-- DB results dropdown -->
+            <div id="inspDBList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;max-height:100px;overflow-y:auto;font-size:10px;margin-bottom:6px;">
+              <!-- filled by JS -->
+            </div>
+            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:3px;">Piešķirtie inspektori:</div>
+            <div id="assignedInspList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;min-height:40px;max-height:90px;overflow-y:auto;font-size:11px;"></div>
+            <div style="margin-top:5px;">
               <button class="btn sm" onclick="autoDistribute()" style="width:100%;">&#9654; Sadalīt automātiski</button>
             </div>
           </div>
+
           <!-- Right: distribution table -->
           <div style="flex:1;">
-            <div style="font-size:10px;color:#444;margin-bottom:4px;font-weight:bold;">Personu sadalījums:</div>
+            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:4px;">Personu sadalījums:</div>
             <table class="insp-table" id="inspTable">
               <thead><tr>
                 <th style="width:160px;">Inspektors</th>
@@ -316,6 +334,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
             </tr></thead><tbody id="cDocsTbody"></tbody></table>
             <div style="display:flex;gap:4px;margin-top:6px;">
               <button class="btn" onclick="viewDocument()">Apskatīt dokumentu</button>
+              <button class="btn nw" onclick="openRegDocModal()">+ Reģistrēt dokumentu</button>
             </div>
           </div>
 
@@ -323,14 +342,16 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <div class="ctab-panel" id="cpanel_resp">
             <table class="wt"><thead><tr>
               <th style="width:18px;"></th>
-              <th style="width:130px;">Sagatavošanas datums</th>
-              <th style="width:140px;">Reģistrācijas numurs</th>
+              <th style="width:120px;">Sagatavošanas datums</th>
+              <th style="width:130px;">Reģistrācijas numurs</th>
               <th>Atbildes dokumenta veids</th>
-              <th style="width:120px;">Nosūtīšanas veids</th>
-              <th style="width:110px;">Nosūtīšanas datums</th>
+              <th style="width:110px;">Nosūtīšanas veids</th>
+              <th style="width:100px;">Nosūtīšanas datums</th>
+              <th style="width:90px;">Personas</th>
             </tr></thead><tbody id="cRespTbody"></tbody></table>
             <div style="display:flex;gap:4px;margin-top:6px;">
               <button class="btn" onclick="viewSelectedResp('c')">Apskatīt atbildi</button>
+              <button class="btn nw" onclick="openNewRespModal()">+ Pievienot atbildi</button>
             </div>
           </div>
 
@@ -470,6 +491,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
         </tr></thead><tbody id="pDocsTbody"></tbody></table>
         <div style="display:flex;gap:4px;margin-top:4px;">
           <button class="btn" onclick="viewDocument()">Apskatīt dokumentu</button>
+          <button class="btn nw" onclick="openRegDocModal()">+ Reģistrēt dokumentu</button>
         </div>
       </fieldset>
 
@@ -520,16 +542,82 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
   </div>
 </div>
 
+<!-- REG DOC MODAL -->
+<div class="mo" id="regDocModal">
+  <div class="mw" style="min-width:460px;">
+    <div class="mt"><span>Reģistrēt dokumentu</span><button class="tbtn" onclick="closeModal('regDocModal')">✕</button></div>
+    <div class="mb">
+      <div style="display:grid;grid-template-columns:130px 1fr;gap:6px;align-items:center;row-gap:5px;">
+        <span class="rl">Dokumenta nosaukums</span><input class="wi" id="rdName" style="width:100%;" placeholder="Faila nosaukums...">
+        <span class="rl">Dokumenta veids</span>
+        <select class="ws" id="rdType" style="width:100%;">
+          <option>Darba līgums</option><option>Norīkojuma vēstule</option><option>Pase / ID karte</option>
+          <option>Izziņa par apdrošināšanu</option><option>Darba devēja apliecinājums</option>
+          <option>A1 sertifikāts</option><option>Lēmums</option><option>Cits</option>
+        </select>
+        <span class="rl">Apraksts</span><input class="wi" id="rdDescr" style="width:100%;" placeholder="Īss apraksts...">
+        <span class="rl">Reģistrācijas datums</span><input class="wi" id="rdDate" style="width:120px;">
+        <span class="rl">Saistītā persona</span>
+        <select class="ws" id="rdPerson" style="width:100%;">
+          <option value="">— Visi —</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn pr" onclick="saveRegDoc()">Reģistrēt</button>
+      <button class="btn" onclick="closeModal('regDocModal')">Atcelt</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW RESPONSE MODAL -->
+<div class="mo" id="newRespModal">
+  <div class="mw" style="min-width:500px;">
+    <div class="mt"><span>Pievienot sagatavoto atbildi</span><button class="tbtn" onclick="closeModal('newRespModal')">✕</button></div>
+    <div class="mb">
+      <div style="display:grid;grid-template-columns:140px 1fr;gap:6px;align-items:center;row-gap:5px;">
+        <span class="rl">Atbildes dokumenta veids</span>
+        <select class="ws" id="nrDocType" style="width:100%;">
+          <option>A1 sertifikāts</option><option>Noraidījuma lēmums</option>
+          <option>Pieprasījums pēc info</option><option>Atteikuma lēmums</option><option>Cits</option>
+        </select>
+        <span class="rl">Nosūtīšanas veids</span>
+        <select class="ws" id="nrSendType" style="width:100%;">
+          <option>E-pasts</option><option>Pa pastu</option><option>Portāls latvija.lv</option><option>Klātienē</option>
+        </select>
+        <span class="rl">Nosūtīšanas datums</span><input class="wi" id="nrSendDate" style="width:120px;">
+        <span class="rl" style="align-self:flex-start;padding-top:4px;">Personas</span>
+        <div id="nrPersonList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;padding:4px;font-size:11px;max-height:120px;overflow-y:auto;"></div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn pr" onclick="saveNewResp()">Pievienot</button>
+      <button class="btn" onclick="closeModal('newRespModal')">Atcelt</button>
+    </div>
+  </div>
+</div>
+
 <div class="nt" id="notif"><div class="nt-t" id="ntT"></div><div id="ntX"></div></div>
 
 <script>
-var INSPECTORS=['ĀBOLTIŅA I.','KALNIŅA J.','STRAUTIŅŠ P.','OZOLIŅA S.'];
+var INSP_DB=[
+  {id:1,name:'Āboltiņa Inese',short:'ĀBOLTIŅA I.'},
+  {id:2,name:'Kalniņa Juta',short:'KALNIŅA J.'},
+  {id:3,name:'Strautiņš Pēteris',short:'STRAUTIŅŠ P.'},
+  {id:4,name:'Ozoliņa Sandra',short:'OZOLIŅA S.'},
+  {id:5,name:'Bērziņš Andris',short:'BĒRZIŅŠ A.'},
+  {id:6,name:'Liepiņa Maija',short:'LIEPIŅA M.'},
+  {id:7,name:'Krūmiņš Jānis',short:'KRŪMIŅŠ J.'},
+  {id:8,name:'Puķe Elīna',short:'PUĶE E.'},
+  {id:9,name:'Vītols Roberts',short:'VĪTOLS R.'},
+  {id:10,name:'Zemīte Daina',short:'ZEMĪTE D.'}
+];
 
 var apps=[
   {id:'A001',nr:'11724',date:'13.04.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
    appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz DE, LT, PL',appRegNr:'VSAA-2026-A1-11724',appRegDate:'13.04.2026',receiveType:'E-iesniegums (portāls)',
-   status:'proc',expanded:false,inspectorCount:2,
+   status:'proc',expanded:false,selectedInspectors:['ĀBOLTIŅA I.','KALNIŅA J.'],
    persons:[
      {name:'STEINBRUCK RALF MICHAEL',kods:'111111-11111',valsts:'Vācija (DE)',veids:'Norīkotais darbinieks',no:'01.05.2026',lidz:'31.10.2026',devejs:'Kreiss GmbH, Berlīne',iesniegts:'13.04.2026',status:'proc',inspector:'ĀBOLTIŅA I.'},
      {name:'ZUOZU SIGITAS',kods:'311111-11112',valsts:'Lietuva (LT)',veids:'Norīkotais darbinieks',no:'15.05.2026',lidz:'15.11.2026',devejs:'UAB Kreiss, Viļņa',iesniegts:'13.04.2026',status:'proc',inspector:'KALNIŅA J.'},
@@ -538,21 +626,19 @@ var apps=[
    docs:[
      {name:'darba_ligums_ralf.pdf',size:'245 KB',descr:'Darba līguma kopija',date:'13.04.2026'},
      {name:'norikojums_DE_ralf.pdf',size:'118 KB',descr:'Norīkojuma vēstule uz Vāciju',date:'13.04.2026'}
-   ],
-   responses:[]
+   ],responses:[]
   },
   {id:'A002',nr:'11725',date:'12.03.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
    appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz EE',appRegNr:'VSAA-2026-A1-11725',appRegDate:'12.03.2026',receiveType:'E-iesniegums (portāls)',
-   status:'new',expanded:false,inspectorCount:1,
+   status:'new',expanded:false,selectedInspectors:[],
    persons:[{name:'PETROV ALEKSANDR',kods:'211111-21111',valsts:'Igaunija (EE)',veids:'Norīkotais darbinieks',no:'01.04.2026',lidz:'30.09.2026',devejs:'AS Kreiss Eesti, Tallina',iesniegts:'12.03.2026',status:'new',inspector:''}],
-   docs:[{name:'petrov_darba_lig.pdf',size:'189 KB',descr:'Darba līgums',date:'12.03.2026'}],
-   responses:[]
+   docs:[{name:'petrov_darba_lig.pdf',size:'189 KB',descr:'Darba līgums',date:'12.03.2026'}],responses:[]
   },
   {id:'A003',nr:'11726',date:'10.03.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
    appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz SE',appRegNr:'VSAA-2026-A1-11726',appRegDate:'10.03.2026',receiveType:'Klātienē',
-   status:'ok',expanded:false,inspectorCount:1,
+   status:'ok',expanded:false,selectedInspectors:['ĀBOLTIŅA I.'],
    persons:[{name:'KALNIŅŠ ANDRIS',kods:'411111-41111',valsts:'Zviedrija (SE)',veids:'Norīkotais darbinieks',no:'01.04.2026',lidz:'30.09.2026',devejs:'Kreiss Sverige AB, Stokholma',iesniegts:'10.03.2026',status:'ok',inspector:'ĀBOLTIŅA I.'}],
    docs:[{name:'a1_kalnins_SE.pdf',size:'98 KB',descr:'Izsniegts A1 sertifikāts',date:'15.03.2026'}],
    responses:[{prepDate:'15.03.2026 09:05',regNr:'ATB-2026-11726-01',docType:'A1 sertifikāts',sendType:'E-pasts',sendDate:'15.03.2026',persons:['411111-41111']}]
@@ -560,7 +646,7 @@ var apps=[
   {id:'A004',nr:'11720',date:'01.02.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
    appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz AT',appRegNr:'VSAA-2026-A1-11720',appRegDate:'01.02.2026',receiveType:'Pa pastu',
-   status:'no',expanded:false,inspectorCount:1,
+   status:'no',expanded:false,selectedInspectors:['STRAUTIŅŠ P.'],
    persons:[{name:'MÜLLER HANS',kods:'511111-51111',valsts:'Austrija (AT)',veids:'Norīkotais darbinieks',no:'01.01.2026',lidz:'31.01.2026',devejs:'Kreiss GmbH Wien, Vīne',iesniegts:'01.02.2026',status:'no',inspector:'STRAUTIŅŠ P.'}],
    docs:[{name:'muller_norikojums.pdf',size:'205 KB',descr:'Norīkojuma vēstule',date:'01.02.2026'}],
    responses:[{prepDate:'10.02.2026 10:00',regNr:'ATB-2026-11720-01',docType:'Noraidījuma lēmums',sendType:'E-pasts',sendDate:'10.02.2026',persons:['511111-51111']}]
@@ -568,7 +654,7 @@ var apps=[
   {id:'A005',nr:'11701',date:'15.01.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
    appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz NL',appRegNr:'VSAA-2026-A1-11701',appRegDate:'15.01.2026',receiveType:'E-iesniegums (portāls)',
-   status:'proc',expanded:false,inspectorCount:1,
+   status:'proc',expanded:false,selectedInspectors:['OZOLIŅA S.'],
    persons:[{name:'KOWALSKI PIOTR',kods:'611111-61111',valsts:'Nīderlande (NL)',veids:'Norīkotais darbinieks',no:'01.02.2026',lidz:'31.07.2026',devejs:'Kreiss BV, Amsterdama',iesniegts:'15.01.2026',status:'proc',inspector:'OZOLIŅA S.'}],
    docs:[{name:'kowalski_ligums.pdf',size:'312 KB',descr:'Darba līgums',date:'15.01.2026'},{name:'kreiss_bv_reg.pdf',size:'88 KB',descr:'Darba devēja reģistrācija NL',date:'15.01.2026'}],
    responses:[]
@@ -627,15 +713,8 @@ function onSelectApp(app){
   sv('cAppRegDate',app.appRegDate);sv('cAppReceiveType',app.receiveType);
   sv('cAppPersonCount',app.persons.length);
   sv('cAppUnprocessed',app.persons.filter(function(p){return p.status==='new'||p.status==='proc';}).length);
-  // Send fields
   if(app.sendType)document.getElementById('cSendType').value=app.sendType;
   sv('cSendTo',app.sendTo||app.epasts||'');
-  // Sync selectedInspectors from existing assignments
-  if(!app.selectedInspectors){
-    var used={};
-    app.persons.forEach(function(p){if(p.inspector)used[p.inspector]=true;});
-    app.selectedInspectors=Object.keys(used);
-  }
   renderInspectors(app);
   document.getElementById('atteiktChk').checked=false;
   document.getElementById('atteiktSection').className='atts';
@@ -660,7 +739,7 @@ function onSelectPerson(app,p){
   var b=document.getElementById('currentStatus');b.className='badge '+sBadge[p.status];b.textContent=sLbl[p.status];
   var dv=p.status==='no'?'decline':'approve';
   document.querySelector('input[name="decision"][value="'+dv+'"]').checked=true;handleDecision(dv);
-  var pResp=app.responses.filter(function(r){return !r.persons||r.persons.indexOf(p.kods)!==-1;});
+  var pResp=app.responses.filter(function(r){return !r.persons||!r.persons.length||r.persons.indexOf(p.kods)!==-1;});
   renderResponses('pRespTbody',pResp,app,'p');
   selectedRespIdx.p=-1;
   renderDocs('pDocsTbody',app.docs);
@@ -676,59 +755,80 @@ function switchCTab(name){
   });
 }
 
-function renderInspectorCheckboxes(app){
-  var div=document.getElementById('inspCheckboxes');
-  if(!div)return;
-  div.innerHTML='';
-  INSPECTORS.forEach(function(insp){
-    var checked=app.persons.some(function(p){return p.inspector===insp;})||
-                (app.selectedInspectors&&app.selectedInspectors.indexOf(insp)!==-1);
-    var lbl=document.createElement('label');
-    lbl.className='fl';
-    lbl.style.cssText='gap:5px;cursor:pointer;padding:2px 0;';
-    lbl.innerHTML='<input type="checkbox" '+(checked?'checked':'')+' value="'+insp+'" onchange="onInspCheckChange()"> '+insp;
-    div.appendChild(lbl);
-  });
+// ======= INSPECTOR DB =======
+function filterInspDB(){
+  var q=(document.getElementById('inspSearchInput')||{}).value||'';
+  q=q.toLowerCase();
+  var box=document.getElementById('inspDBList');
+  if(!box)return;
+  var sel=selApp?selApp.selectedInspectors||[]:[];
+  var results=INSP_DB.filter(function(i){return i.name.toLowerCase().indexOf(q)!==-1&&sel.indexOf(i.short)===-1;});
+  if(!q&&!results.length){box.innerHTML='<div style="padding:3px 5px;color:#999;font-style:italic;font-size:10px;">Ierakstiet vārdu meklēšanai...</div>';return;}
+  if(!results.length){box.innerHTML='<div style="padding:3px 5px;color:#999;font-size:10px;">Nav atrasts</div>';return;}
+  box.innerHTML=results.map(function(i){
+    return '<div onclick="addInspector(\''+i.short+'\',\''+i.name+'\')" '+
+      'style="padding:3px 6px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:10px;" '+
+      'onmouseover="this.style.background=\'#316ac5\';this.style.color=\'#fff\'" '+
+      'onmouseout="this.style.background=\'\';this.style.color=\'\'">'+i.name+'</div>';
+  }).join('');
 }
 
-function getSelectedInspectors(){
-  var chks=document.querySelectorAll('#inspCheckboxes input[type=checkbox]:checked');
-  return Array.from(chks).map(function(c){return c.value;});
-}
-
-function onInspCheckChange(){
+function addInspector(short,full){
   if(!selApp)return;
-  var sel=getSelectedInspectors();
-  selApp.selectedInspectors=sel;
+  if(!selApp.selectedInspectors)selApp.selectedInspectors=[];
+  if(selApp.selectedInspectors.indexOf(short)!==-1)return;
+  selApp.selectedInspectors.push(short);
+  document.getElementById('inspSearchInput').value='';
+  renderAssignedInspList();
+  filterInspDB();
   renderInspTable(selApp);
+}
+
+function removeInspector(short){
+  if(!selApp||!selApp.selectedInspectors)return;
+  selApp.selectedInspectors=selApp.selectedInspectors.filter(function(s){return s!==short;});
+  selApp.persons.forEach(function(p){if(p.inspector===short)p.inspector='';});
+  renderAssignedInspList();filterInspDB();renderInspTable(selApp);renderList();
+}
+
+function renderAssignedInspList(){
+  var box=document.getElementById('assignedInspList');
+  if(!box||!selApp)return;
+  var sel=selApp.selectedInspectors||[];
+  if(!sel.length){box.innerHTML='<div style="padding:4px 6px;color:#999;font-style:italic;font-size:10px;">Nav pievienotu inspektoru</div>';return;}
+  box.innerHTML=sel.map(function(s){
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:2px 5px;border-bottom:1px solid #f0f0f0;font-size:10px;">'+
+      '<span>'+s+'</span>'+
+      '<span onclick="removeInspector(\''+s+'\')" style="cursor:pointer;color:#880000;font-weight:bold;padding:0 3px;" title="Noņemt">✕</span></div>';
+  }).join('');
+}
+
+function renderInspectors(app){
+  if(!app.selectedInspectors){
+    var used={};app.persons.forEach(function(p){if(p.inspector)used[p.inspector]=true;});
+    app.selectedInspectors=Object.keys(used);
+  }
+  var si=document.getElementById('inspSearchInput');if(si)si.value='';
+  filterInspDB();renderAssignedInspList();renderInspTable(app);
 }
 
 function autoDistribute(){
   if(!selApp||!selApp.persons.length){showNotif('Nav personu','Iesniegumam nav pievienotu personu.');return;}
-  var sel=getSelectedInspectors();
-  if(!sel.length){showNotif('Nav izvēlēts','Lūdzu atzīmējiet vismaz vienu inspektoru.');return;}
-  // Clear all
+  var sel=selApp.selectedInspectors||[];
+  if(!sel.length){showNotif('Nav inspektoru','Lūdzu pievienojiet vismaz vienu inspektoru.');return;}
   selApp.persons.forEach(function(p){p.inspector='';});
-  // Round-robin distribution
-  selApp.persons.forEach(function(p,i){
-    p.inspector=sel[i%sel.length];
-  });
-  selApp.selectedInspectors=sel;
-  renderInspTable(selApp);
-  renderList();
+  selApp.persons.forEach(function(p,i){p.inspector=sel[i%sel.length];});
+  renderInspTable(selApp);renderList();
   showNotif('✔ Sadalīts',''+selApp.persons.length+' personas sadalītas starp '+sel.length+' inspektoru(-iem).');
 }
 
 function renderInspTable(app){
-  var sel=app.selectedInspectors||getSelectedInspectors();
-  var tb=document.getElementById('inspTbody');
-  var note=document.getElementById('inspNote');
-  if(!tb)return;
-  tb.innerHTML='';
+  var sel=app.selectedInspectors||[];
+  var tb=document.getElementById('inspTbody'),note=document.getElementById('inspNote');
+  if(!tb)return;tb.innerHTML='';
   if(!sel.length){
-    tb.innerHTML='<tr class="er"><td colspan="3">Nav izvēlētu inspektoru</td></tr>';
-    if(note)note.textContent='';
-    return;
+    tb.innerHTML='<tr class="er"><td colspan="3">Nav pievienotu inspektoru. Izmantojiet meklēšanas lauku kreisajā pusē.</td></tr>';
+    if(note)note.textContent='';return;
   }
   sel.forEach(function(insp){
     var assigned=app.persons.filter(function(p){return p.inspector===insp;});
@@ -737,19 +837,72 @@ function renderInspTable(app){
       return '<span style="display:inline-flex;align-items:center;gap:3px;background:#e8f0ff;border:1px solid #99aee0;padding:1px 5px;margin:1px 2px;font-size:10px;">'+
         '<span class="sd '+sDot[p.status]+'" style="width:7px;height:7px;"></span>'+p.kods+'</span>';
     }).join(''):'<span style="color:#999;font-style:italic;font-size:10px;">—</span>';
-    tr.innerHTML='<td><strong>'+insp+'</strong></td>'+
-      '<td style="text-align:center;font-weight:bold;">'+assigned.length+'</td>'+
-      '<td>'+pills+'</td>';
+    tr.innerHTML='<td><strong>'+insp+'</strong></td><td style="text-align:center;font-weight:bold;">'+assigned.length+'</td><td>'+pills+'</td>';
     tb.appendChild(tr);
   });
-  var total=app.persons.length;
-  var perInsp=sel.length?Math.ceil(total/sel.length):0;
-  if(note)note.textContent='Kopā '+total+' persona(-s), ~'+perInsp+' uz inspektoru. Nepiešķirtas: '+app.persons.filter(function(p){return !p.inspector;}).length+'.';
+  var total=app.persons.length,perI=sel.length?Math.ceil(total/sel.length):0;
+  if(note)note.textContent='Kopā '+total+' persona(-s), ~'+perI+' uz inspektoru. Nepiešķirtas: '+app.persons.filter(function(p){return !p.inspector;}).length+'.';
 }
 
-function renderInspectors(app){
-  renderInspectorCheckboxes(app);
-  renderInspTable(app);
+function assignInspector(){
+  if(!selPerson)return;
+  selPerson.inspector=document.getElementById('pInspector').value;
+  renderList();if(selApp)renderInspTable(selApp);
+}
+
+// ======= REG DOC MODAL =======
+function openRegDocModal(){
+  if(!selApp){showInfo('Kļūda','Nav izvēlēts iesniegums.');return;}
+  var now=new Date();
+  document.getElementById('rdDate').value=pad(now.getDate())+'.'+pad(now.getMonth()+1)+'.'+now.getFullYear();
+  document.getElementById('rdName').value='';document.getElementById('rdDescr').value='';
+  var ps=document.getElementById('rdPerson');
+  ps.innerHTML='<option value="">— Visi —</option>';
+  selApp.persons.forEach(function(p){var o=document.createElement('option');o.value=p.kods;o.textContent=p.kods+' '+p.name;ps.appendChild(o);});
+  document.getElementById('regDocModal').classList.add('show');
+}
+function saveRegDoc(){
+  var n=document.getElementById('rdName').value.trim();
+  if(!n){showInfo('Kļūda','Ievadiet dokumenta nosaukumu.');return;}
+  var now=new Date(),dt=pad(now.getDate())+'.'+pad(now.getMonth()+1)+'.'+now.getFullYear();
+  selApp.docs.push({name:n,size:'—',descr:document.getElementById('rdDescr').value||document.getElementById('rdType').value,date:document.getElementById('rdDate').value||dt});
+  closeModal('regDocModal');
+  renderDocs('cDocsTbody',selApp.docs);
+  if(viewMode==='person')renderDocs('pDocsTbody',selApp.docs);
+  showNotif('+ Reģistrēts','Dokuments "'+n+'" pievienots iesniegumam.');
+}
+
+// ======= NEW RESP MODAL =======
+function openNewRespModal(){
+  if(!selApp){showInfo('Kļūda','Nav izvēlēts iesniegums.');return;}
+  var now=new Date();
+  document.getElementById('nrSendDate').value=pad(now.getDate())+'.'+pad(now.getMonth()+1)+'.'+now.getFullYear();
+  var pl=document.getElementById('nrPersonList');
+  pl.innerHTML=selApp.persons.length?selApp.persons.map(function(p,i){
+    return '<label style="display:flex;align-items:center;gap:5px;padding:2px 0;cursor:pointer;border-bottom:1px solid #f0f0f0;">'+
+      '<input type="checkbox" id="nrp_'+i+'" value="'+p.kods+'">'+
+      '<span class="sd '+sDot[p.status]+'" style="width:8px;height:8px;"></span>'+
+      '<span>'+p.kods+' '+p.name+'</span></label>';
+  }).join(''):'<div style="color:#999;font-style:italic;font-size:10px;padding:4px;">Nav personu</div>';
+  document.getElementById('newRespModal').classList.add('show');
+}
+function saveNewResp(){
+  var dt=document.getElementById('nrDocType').value;
+  var st=document.getElementById('nrSendType').value;
+  var sd=document.getElementById('nrSendDate').value;
+  var chks=document.querySelectorAll('#nrPersonList input[type=checkbox]:checked');
+  var persons=Array.from(chks).map(function(c){return c.value;});
+  var now=new Date();
+  var prepDt=pad(now.getDate())+'.'+pad(now.getMonth()+1)+'.'+now.getFullYear()+' '+pad(now.getHours())+':'+pad(now.getMinutes());
+  var rn='ATB-'+now.getFullYear()+'-'+selApp.nr+'-0'+(selApp.responses.length+1);
+  selApp.responses.push({prepDate:prepDt,regNr:rn,docType:dt,sendType:st,sendDate:sd,persons:persons});
+  closeModal('newRespModal');
+  renderResponses('cRespTbody',selApp.responses,selApp,'c');
+  if(viewMode==='person'&&selPerson){
+    var pr=selApp.responses.filter(function(r){return !r.persons.length||r.persons.indexOf(selPerson.kods)!==-1;});
+    renderResponses('pRespTbody',pr,selApp,'p');
+  }
+  showNotif('+ Pievienota','Atbilde "'+dt+'" pievienota ('+persons.length+' personas).');
 }
 
 function assignInspector(){
