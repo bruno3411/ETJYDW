@@ -478,25 +478,11 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
         </div>
       </fieldset>
 
-      <!-- PERSON DOCS -->
-      <fieldset class="g">
-        <legend>Iesniegumam pievienotie dokumenti</legend>
-        <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:4px;gap:8px;">
-          <label class="fl" style="gap:5px;cursor:pointer;font-size:11px;"><input type="checkbox" id="pOnlyReply"> Tikai atbilde uz saņemto dokumentu</label>
-        </div>
-        <table class="wt"><thead><tr>
-          <th style="width:55px;">Kods</th>
-          <th>Nosaukums</th>
-          <th style="width:120px;">Reģ. numurs</th>
-          <th style="width:95px;">Nosūtīšanas datums</th>
-          <th style="width:70px;">Statuss</th>
-          <th style="width:90px;">Nosūtīšanas veids</th>
-          <th style="width:80px;">Sagatavoja</th>
-          <th style="width:80px;">Apstiprināja</th>
-        </tr></thead><tbody id="pDocsTbody"></tbody></table>
-        <div style="display:flex;gap:4px;margin-top:4px;">
-          <button class="btn" onclick="viewDocument()">Apskatīt dokumentu</button>
-          <button class="btn nw" onclick="openRegDocModal()">+ Reģistrēt dokumentu</button>
+      <!-- PERSON DECISION INFO -->
+      <fieldset class="g" id="pDecisionInfoBlock">
+        <legend>Informācija par sagatavoto atbildi</legend>
+        <div id="pDecisionInfo" style="padding:4px 0;">
+          <div style="color:#999;font-style:italic;font-size:11px;">Nav pieņemta lēmuma.</div>
         </div>
       </fieldset>
 
@@ -758,8 +744,96 @@ function onSelectPerson(app,p){
   selectedRespIdx.p=-1;
   renderDocs('pDocsTbody',app.docs);
   checkAutoDeny();
+  renderPersonDecisionInfo(app, p);
   setStatus('Izvēlēta persona: '+p.kods+' '+p.name+' ('+app.company+')');
   document.getElementById('statusSel').textContent=p.kods;
+}
+
+// ======= PERSON DECISION INFO =======
+function renderPersonDecisionInfo(app, p){
+  var box=document.getElementById('pDecisionInfo');
+  if(!box)return;
+
+  // Find the latest response for this person
+  var resp=null;
+  for(var i=app.responses.length-1;i>=0;i--){
+    var r=app.responses[i];
+    if(!r.persons||!r.persons.length||r.persons.indexOf(p.kods)!==-1){resp=r;break;}
+  }
+
+  if(p.status==='new'||p.status==='proc'){
+    box.innerHTML='<div style="color:#884400;font-style:italic;font-size:11px;">Lēmums vēl nav pieņemts.</div>';
+    return;
+  }
+
+  if(p.status==='no'){
+    // Declined
+    var reason=p.declineReason||p.lastDeclineReason||'Noraidīts';
+    var law=p.declineLaw||'—';
+    box.innerHTML=
+      '<div style="display:grid;grid-template-columns:140px 1fr;gap:5px;align-items:flex-start;">'+
+      '<span style="text-align:right;color:#880000;font-weight:bold;">Lēmuma veids</span>'+
+      '<span class="badge br">Noraidīts</span>'+
+      '<span style="text-align:right;font-weight:bold;">Atteikuma iemesls</span>'+
+      '<span>'+reason+'</span>'+
+      '<span style="text-align:right;font-weight:bold;">Tiesiskais pamatojums</span>'+
+      '<span>'+law+'</span>'+
+      (resp?'<span style="text-align:right;font-weight:bold;">Lēmuma datums</span><span>'+resp.sendDate+'</span>':'')+''+
+      '</div>';
+    return;
+  }
+
+  if(p.status==='ok'){
+    // Approved — build from approval data
+    var dateFrom=p.approvedFrom||p.no||'—';
+    var dateTo=p.approvedTo||p.lidz||'—';
+    var breakFrom=p.breakFrom||'—';
+    var breakTo=p.breakTo||'—';
+    var countries=p.countries||[p.valsts||'—'];
+    box.innerHTML=
+      '<div style="display:grid;grid-template-columns:160px 1fr;gap:5px;align-items:flex-start;">'+
+      '<span style="text-align:right;font-weight:bold;">Lēmuma veids</span>'+
+      '<span class="badge bo">Apstiprināts</span>'+
+      '<span style="text-align:right;font-weight:bold;">Sākuma datums</span>'+
+      '<span>'+dateFrom+'</span>'+
+      '<span style="text-align:right;font-weight:bold;">Beigu datums</span>'+
+      '<span>'+dateTo+'</span>'+
+      '<span style="text-align:right;font-weight:bold;">Pārtraukuma sākums</span>'+
+      '<input class="wi" style="width:120px;" value="'+breakFrom+'" onchange="if(selPerson)selPerson.breakFrom=this.value" placeholder="—">'+
+      '<span style="text-align:right;font-weight:bold;">Pārtraukuma beigas</span>'+
+      '<input class="wi" style="width:120px;" value="'+breakTo+'" onchange="if(selPerson)selPerson.breakTo=this.value" placeholder="—">'+
+      '<span style="text-align:right;font-weight:bold;align-self:flex-start;padding-top:2px;">Norīkojuma valstis</span>'+
+      '<div id="pCountriesList">'+renderCountriesList(countries)+'</div>'+
+      '</div>'+
+      '<div style="margin-top:6px;"><button class="btn sm" onclick="addCountry()">+ Pievienot valsti</button></div>';
+    return;
+  }
+}
+
+function renderCountriesList(countries){
+  return countries.map(function(c,i){
+    return '<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">'+
+      '<input class="wi" style="width:160px;" value="'+c+'" onchange="updateCountry('+i+',this.value)">'+
+      '<span onclick="removeCountry('+i+')" style="cursor:pointer;color:#880000;font-weight:bold;font-size:12px;" title="Noņemt">✕</span>'+
+      '</div>';
+  }).join('');
+}
+
+function addCountry(){
+  if(!selPerson)return;
+  if(!selPerson.countries)selPerson.countries=[selPerson.valsts||''];
+  selPerson.countries.push('');
+  document.getElementById('pCountriesList').innerHTML=renderCountriesList(selPerson.countries);
+}
+function removeCountry(idx){
+  if(!selPerson||!selPerson.countries)return;
+  selPerson.countries.splice(idx,1);
+  document.getElementById('pCountriesList').innerHTML=renderCountriesList(selPerson.countries);
+}
+function updateCountry(idx,val){
+  if(!selPerson){return;}
+  if(!selPerson.countries)selPerson.countries=[];
+  selPerson.countries[idx]=val;
 }
 
 // ======= AUTO-DENY =======
@@ -897,10 +971,14 @@ function autoDistribute(){
   if(!selApp||!selApp.persons.length){showNotif('Nav personu','Iesniegumam nav pievienotu personu.');return;}
   var sel=selApp.selectedInspectors||[];
   if(!sel.length){showNotif('Nav inspektoru','Lūdzu pievienojiet vismaz vienu inspektoru.');return;}
-  selApp.persons.forEach(function(p){p.inspector='';});
-  selApp.persons.forEach(function(p,i){p.inspector=sel[i%sel.length];});
+  // Only distribute persons with status 'new' or 'proc'
+  var eligible=selApp.persons.filter(function(p){return p.status==='new'||p.status==='proc';});
+  if(!eligible.length){showNotif('Nav neapstrādātu personu','Visas personas ir jau apstiprinātas vai noraidītas.');return;}
+  // Clear inspectors only for eligible persons
+  eligible.forEach(function(p){p.inspector='';});
+  eligible.forEach(function(p,i){p.inspector=sel[i%sel.length];});
   renderInspTable(selApp);renderList();
-  showNotif('✔ Sadalīts',''+selApp.persons.length+' personas sadalītas starp '+sel.length+' inspektoru(-iem).');
+  showNotif('✔ Sadalīts',eligible.length+' neapstrādātas personas sadalītas starp '+sel.length+' inspektoru(-iem). Jau apstrādātas — nemainītas.');
 }
 
 function renderInspTable(app){
@@ -1133,11 +1211,17 @@ function confirmDecision(){
   var rn='ATB-'+now.getFullYear()+'-'+selApp.nr+'-0'+(selApp.responses.length+1);
   if(dec==='approve'){
     selPerson.status='ok';
+    selPerson.approvedFrom=document.getElementById('approveDateFrom').value;
+    selPerson.approvedTo=document.getElementById('approveDateTo').value;
+    if(!selPerson.countries)selPerson.countries=[selPerson.valsts||'—'];
     selApp.status=selApp.persons.every(function(p){return p.status==='ok';})?'ok':'proc';
     selApp.responses.push({prepDate:dt,regNr:rn,docType:'A1 sertifikāts',sendType:'E-pasts',sendDate:dt.split(' ')[0],persons:[selPerson.kods]});
     showNotif('✔ Apstiprināts','A1 sertifikāts apstiprināts un nosūtīts iesniedzējam.');
   } else if(dec==='decline'){
+    var rs=document.getElementById('declineReason');
     selPerson.status='no';selApp.status='no';
+    selPerson.declineReason=rs.selectedIndex>0?rs.options[rs.selectedIndex].text:'Noraidīts';
+    selPerson.declineLaw=document.getElementById('declineLawInput').value||'—';
     selApp.responses.push({prepDate:dt,regNr:rn,docType:'Noraidījuma lēmums',sendType:'E-pasts',sendDate:dt.split(' ')[0],persons:[selPerson.kods]});
     showNotif('✘ Noraidīts','Iesniegums noraidīts. Paziņojums nosūtīts iesniedzējam.');
   } else {
