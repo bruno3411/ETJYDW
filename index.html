@@ -985,7 +985,7 @@ function renderInspTable(app){
       '<td style="padding:2px 5px;font-size:11px;">'+p.kods+' '+p.name+'</td>'+
       '<td style="padding:2px 4px;">'+
         (sel.length
-          ? '<select class="ws" style="font-size:10px;height:20px;width:160px;" onchange="setPersonInspector('' +p.kods+ '',this.value)">'+
+          ? '<select class="ws" style="font-size:10px;height:20px;width:160px;" onchange="setPersonInspector(\'+p.kods+\',this.value)">'+
               '<option value="">— Nav piešķirts —</option>'+opts+
             '</select>'
           : '<span style="font-size:10px;color:#aaa;font-style:italic;">Pievienojiet inspektoru</span>')+
@@ -1076,13 +1076,6 @@ function saveNewResp(){
     renderResponses('pRespTbody',pr,selApp,'p');
   }
   showNotif('+ Pievienota','Atbilde "'+dt+'" pievienota ('+persons.length+' personas).');
-}
-
-function assignInspector(){
-  if(!selPerson)return;
-  selPerson.inspector=document.getElementById('pInspector').value;
-  renderList();
-  if(selApp)renderInspTable(selApp);
 }
 
 // ======= RENDER HELPERS =======
