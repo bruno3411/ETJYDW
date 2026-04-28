@@ -235,37 +235,14 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <span class="rl">Inf. par apstrādi tiks nosūtīta</span>
           <input class="wi" id="cSendTo" placeholder="e-pasts vai adrese...">
         </div>
-      </fieldset>
-
-      <!-- INSPECTORS -->
-      <fieldset class="g">
-        <legend>Inspektoru piešķiršana</legend>
-        <div style="margin-top:4px;">
-
-          <!-- Row 1: inspector selector + auto button -->
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span style="font-size:11px;white-space:nowrap;">Pievienot:</span>
-            <select class="ws" id="inspAddSelect" style="flex:1;min-width:180px;max-width:260px;font-size:11px;height:22px;">
-              <option value="">— Izvēlieties inspektoru —</option>
-            </select>
-            <button class="btn sm" onclick="addInspectorFromSelect()" style="white-space:nowrap;">+ Pievienot</button>
-            <button class="btn sm" onclick="autoDistribute()" style="white-space:nowrap;margin-left:auto;">&#9654; Sadalīt automātiski</button>
-          </div>
-
-          <!-- Row 2: person table with inspector dropdowns -->
-          <table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:11px;" id="inspPersonTable">
-            <thead>
-              <tr style="background:#d4d0c8;border-bottom:1px solid #808080;">
-                <th style="padding:2px 5px;text-align:left;font-weight:normal;width:14px;"></th>
-                <th style="padding:2px 5px;text-align:left;font-weight:normal;">Persona</th>
-                <th style="padding:2px 5px;text-align:left;font-weight:normal;width:170px;">Inspektors</th>
-                <th style="padding:2px 5px;text-align:center;font-weight:normal;width:60px;">Statuss</th>
-              </tr>
-            </thead>
-            <tbody id="inspPersonList"></tbody>
-          </table>
-          <div style="font-size:10px;color:#888;margin-top:3px;" id="inspNote"></div>
+        <div style="margin-top:6px;padding-top:5px;border-top:1px solid #c0bdb5;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="font-size:11px;white-space:nowrap;">Piešķirt inspektoru:</span>
+          <select class="ws" id="inspAddSelect" style="min-width:180px;font-size:11px;height:22px;"><option value="">— Izvēlieties —</option></select>
+          <button class="btn sm" onclick="addInspectorFromSelect()">+ Pievienot</button>
+          <button class="btn sm" onclick="autoDistribute()">&#9654; Sadalīt automātiski</button>
+          <span style="font-size:10px;color:#888;margin-left:4px;" id="inspNote"></span>
         </div>
+        <div id="inspPersonList" style="margin-top:4px;"></div>
       </fieldset>
 
       <!-- TABS -->
@@ -373,7 +350,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <span class="rl">Dzimšanas datums</span><input class="wi ro" id="pDzimDat" style="width:120px;" readonly>
           <span class="rl">Miršanas datums</span>
           <div style="display:flex;align-items:center;gap:5px;">
-            <input class="wi" id="pMirsDat" style="width:110px;" placeholder="—" oninput="checkAutoDeny()">
+            <input class="wi" id="pMirsDat" style="width:110px;" placeholder="—">
             <span id="pMirsAlert" style="display:none;color:#cc0000;font-weight:bold;font-size:10px;">⚠ Miris</span>
           </div>
         </div>
@@ -391,13 +368,6 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <select class="ws" id="pInspector" style="width:100%;" onchange="assignInspector()">
             <option value="">— Nav piešķirts —</option>
           </select>
-        </div>
-        <div id="autoDenyBox" style="display:none;margin-top:6px;padding:6px 8px;border:1px solid #cc4444;background:#fff0f0;">
-          <div style="font-weight:bold;color:#880000;font-size:11px;margin-bottom:5px;">⚠ Konstatēts pamats automātiskam noraidījumam:</div>
-          <div id="autoDenyReasons" style="font-size:11px;color:#660000;line-height:1.9;padding-left:4px;"></div>
-          <div style="margin-top:6px;padding-top:4px;border-top:1px solid #ffaaaa;">
-            <label class="fl" style="gap:5px;cursor:pointer;font-size:11px;"><input type="checkbox" id="autoDenyChk" onchange="applyAutoDeny()"> <span style="color:#880000;font-weight:bold;">Automātiski noraidīt ar šo pamatojumu</span></label>
-          </div>
         </div>
       </fieldset>
 
