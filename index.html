@@ -314,11 +314,18 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
 
           <!-- TAB: Dokumenti -->
           <div class="ctab-panel" id="cpanel_docs">
+            <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:4px;gap:8px;">
+              <label class="fl" style="gap:5px;cursor:pointer;font-size:11px;"><input type="checkbox" id="cOnlyReply"> Tikai atbilde uz saņemto dokumentu</label>
+            </div>
             <table class="wt"><thead><tr>
-              <th style="width:200px;">Faila nosaukums</th>
-              <th style="width:70px;">Izmērs</th>
-              <th>Apraksts</th>
-              <th style="width:90px;">Pievienots</th>
+              <th style="width:55px;">Kods</th>
+              <th>Nosaukums</th>
+              <th style="width:120px;">Reģ. numurs</th>
+              <th style="width:95px;">Nosūtīšanas datums</th>
+              <th style="width:70px;">Statuss</th>
+              <th style="width:90px;">Nosūtīšanas veids</th>
+              <th style="width:80px;">Sagatavoja</th>
+              <th style="width:80px;">Apstiprināja</th>
             </tr></thead><tbody id="cDocsTbody"></tbody></table>
             <div style="display:flex;gap:4px;margin-top:6px;">
               <button class="btn" onclick="viewDocument()">Apskatīt dokumentu</button>
@@ -358,6 +365,14 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <span class="rl">Personas kods</span><input class="wi ro" id="pPersKods" readonly>
         </div>
         <div class="g4">
+          <span class="rl">Dzimšanas datums</span><input class="wi ro" id="pDzimDat" style="width:120px;" readonly>
+          <span class="rl">Miršanas datums</span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <input class="wi" id="pMirsDat" style="width:110px;" placeholder="—" oninput="checkAutoDeny()">
+            <span id="pMirsAlert" style="display:none;color:#cc0000;font-weight:bold;font-size:10px;">⚠ Miris</span>
+          </div>
+        </div>
+        <div class="g4">
           <span class="rl">Darba valsts</span><input class="wi ro" id="pValsts" style="width:100%;" readonly>
           <span class="rl">Darba veids</span><input class="wi ro" id="pDarbsVeids" readonly>
         </div>
@@ -370,9 +385,14 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <span class="rl">Apstrādā inspektors</span>
           <select class="ws" id="pInspector" style="width:100%;" onchange="assignInspector()">
             <option value="">— Nav piešķirts —</option>
-            <option>ĀBOLTIŅA I.</option><option>KALNIŅA J.</option>
-            <option>STRAUTIŅŠ P.</option><option>OZOLIŅA S.</option>
           </select>
+        </div>
+        <div id="autoDenyBox" style="display:none;margin-top:6px;padding:6px 8px;border:1px solid #cc4444;background:#fff0f0;">
+          <div style="font-weight:bold;color:#880000;font-size:11px;margin-bottom:5px;">⚠ Konstatēts pamats automātiskam noraidījumam:</div>
+          <div id="autoDenyReasons" style="font-size:11px;color:#660000;line-height:1.9;padding-left:4px;"></div>
+          <div style="margin-top:6px;padding-top:4px;border-top:1px solid #ffaaaa;">
+            <label class="fl" style="gap:5px;cursor:pointer;font-size:11px;"><input type="checkbox" id="autoDenyChk" onchange="applyAutoDeny()"> <span style="color:#880000;font-weight:bold;">Automātiski noraidīt ar šo pamatojumu</span></label>
+          </div>
         </div>
       </fieldset>
 
@@ -461,9 +481,18 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
       <!-- PERSON DOCS -->
       <fieldset class="g">
         <legend>Iesniegumam pievienotie dokumenti</legend>
+        <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:4px;gap:8px;">
+          <label class="fl" style="gap:5px;cursor:pointer;font-size:11px;"><input type="checkbox" id="pOnlyReply"> Tikai atbilde uz saņemto dokumentu</label>
+        </div>
         <table class="wt"><thead><tr>
-          <th style="width:200px;">Faila nosaukums</th><th style="width:70px;">Izmērs</th>
-          <th>Apraksts</th><th style="width:90px;">Pievienots</th>
+          <th style="width:55px;">Kods</th>
+          <th>Nosaukums</th>
+          <th style="width:120px;">Reģ. numurs</th>
+          <th style="width:95px;">Nosūtīšanas datums</th>
+          <th style="width:70px;">Statuss</th>
+          <th style="width:90px;">Nosūtīšanas veids</th>
+          <th style="width:80px;">Sagatavoja</th>
+          <th style="width:80px;">Apstiprināja</th>
         </tr></thead><tbody id="pDocsTbody"></tbody></table>
         <div style="display:flex;gap:4px;margin-top:4px;">
           <button class="btn" onclick="viewDocument()">Apskatīt dokumentu</button>
@@ -709,6 +738,16 @@ function onSelectPerson(app,p){
   renderList();showView('person');
   sv('pPersona',p.name);sv('pPersKods',p.kods);sv('pValsts',p.valsts);sv('pDarbsVeids',p.veids);
   sv('pPeriodsNo',p.no);sv('pPeriodsLidz',p.lidz);sv('pDarbaDev',p.devejs);
+  // Dzimšanas datums from personas kods (LV format: DDMMYY-XXXXX)
+  var dzim='—';
+  if(p.kods&&p.kods.length>=6){
+    var dd=p.kods.substring(0,2),mm=p.kods.substring(2,4),yy=p.kods.substring(4,6);
+    var cent=p.kods.charAt(6)==='1'?'19':'20';
+    dzim=dd+'.'+mm+'.'+cent+yy;
+  }
+  sv('pDzimDat',dzim);
+  sv('pMirsDat',p.mirsDat||'');
+  document.getElementById('pMirsAlert').style.display=p.mirsDat?'inline':'none';
   populatePersonInspDropdown();
   document.getElementById('pInspector').value=p.inspector||'';
   var b=document.getElementById('currentStatus');b.className='badge '+sBadge[p.status];b.textContent=sLbl[p.status];
@@ -718,8 +757,63 @@ function onSelectPerson(app,p){
   renderResponses('pRespTbody',pResp,app,'p');
   selectedRespIdx.p=-1;
   renderDocs('pDocsTbody',app.docs);
+  checkAutoDeny();
   setStatus('Izvēlēta persona: '+p.kods+' '+p.name+' ('+app.company+')');
   document.getElementById('statusSel').textContent=p.kods;
+}
+
+// ======= AUTO-DENY =======
+function checkAutoDeny(){
+  if(!selPerson)return;
+  var reasons=[];
+  var mirsDat=document.getElementById('pMirsDat').value.trim();
+  if(mirsDat){
+    selPerson.mirsDat=mirsDat;
+    document.getElementById('pMirsAlert').style.display='inline';
+    reasons.push('&#9679; Persona mirusi ('+mirsDat+') — EK Regula Nr. 883/2004, 3. pants');
+  } else {
+    selPerson.mirsDat='';
+    document.getElementById('pMirsAlert').style.display='none';
+  }
+  // Check period already past
+  if(selPerson.no){
+    var parts=selPerson.lidz.split('.');
+    if(parts.length===3){
+      var endDate=new Date(parts[2],parts[1]-1,parts[0]);
+      if(endDate<new Date()) reasons.push('&#9679; Norīkojuma periods ir pagājis (beidzās '+selPerson.lidz+') — APL 66. pants');
+    }
+  }
+  // Age check — over 67
+  var dzim=document.getElementById('pDzimDat').value;
+  if(dzim&&dzim!=='—'){
+    var dp=dzim.split('.');
+    if(dp.length===3){
+      var birthDate=new Date(dp[2],dp[1]-1,dp[0]);
+      var age=Math.floor((new Date()-birthDate)/(365.25*24*3600*1000));
+      if(age>=67) reasons.push('&#9679; Persona sasniegusi pensijas vecumu ('+age+' gadi) — VSAA likums 23. pants');
+    }
+  }
+  var box=document.getElementById('autoDenyBox');
+  var rl=document.getElementById('autoDenyReasons');
+  if(reasons.length){
+    rl.innerHTML=reasons.join('<br>');
+    box.style.display='block';
+  } else {
+    box.style.display='none';
+    document.getElementById('autoDenyChk').checked=false;
+  }
+}
+
+function applyAutoDeny(){
+  var chk=document.getElementById('autoDenyChk');
+  if(chk.checked){
+    document.querySelector('input[name="decision"][value="decline"]').checked=true;
+    handleDecision('decline');
+    var reasons=document.getElementById('autoDenyReasons').innerText;
+    document.getElementById('declineReason').value='';
+    document.getElementById('declineLawInput').value=reasons.substring(0,120);
+    showNotif('⚠ Automātiski noraidīts','Lēmums pārslēgts uz "Noraidīt" ar automātisko pamatojumu.');
+  }
 }
 
 function populatePersonInspDropdown(){
@@ -869,7 +963,15 @@ function saveRegDoc(){
   var n=document.getElementById('rdName').value.trim();
   if(!n){showInfo('Kļūda','Ievadiet dokumenta nosaukumu.');return;}
   var now=new Date(),dt=pad(now.getDate())+'.'+pad(now.getMonth()+1)+'.'+now.getFullYear();
-  selApp.docs.push({name:n,size:'—',descr:document.getElementById('rdDescr').value||document.getElementById('rdType').value,date:document.getElementById('rdDate').value||dt});
+  var op=document.getElementById('rdDescr').value||document.getElementById('rdType').value;
+  selApp.docs.push({
+    name:n, size:'—', descr:op,
+    date:document.getElementById('rdDate').value||dt,
+    kods:1000+selApp.docs.length+1,
+    regNr:'DOC-'+now.getFullYear()+'-'+(selApp.docs.length+1),
+    status:'draft', sendType:'E-pasts',
+    sagatavoja:'ĀBOLTIŅA I.', apstiprinaja:'—'
+  });
   closeModal('regDocModal');
   renderDocs('cDocsTbody',selApp.docs);
   if(viewMode==='person')renderDocs('pDocsTbody',selApp.docs);
@@ -921,9 +1023,25 @@ function sv(id,v){var e=document.getElementById(id);if(e)e.value=v!=null?v:'';}
 
 function renderDocs(id,docs){
   var tb=document.getElementById(id);
-  if(!docs||!docs.length){tb.innerHTML='<tr class="er"><td colspan="4">Nav pievienotu dokumentu</td></tr>';return;}
-  tb.innerHTML=docs.map(function(d){
-    return '<tr><td>&#128196; '+d.name+'</td><td>'+d.size+'</td><td>'+d.descr+'</td><td>'+d.date+'</td></tr>';
+  if(!docs||!docs.length){tb.innerHTML='<tr class="er"><td colspan="8">Nav pievienotu dokumentu</td></tr>';return;}
+  var statusBadge={active:'<span class="badge bo">Aktīvs</span>',sent:'<span class="badge bp">Nosūtīts</span>',draft:'<span class="badge bn">Melnraksts</span>',cancelled:'<span class="badge br">Atcelts</span>'};
+  tb.innerHTML=docs.map(function(d,i){
+    var kods=d.kods||(1000+i+1);
+    var status=d.status||'sent';
+    var sendType=d.sendType||'E-pasts';
+    var regNr=d.regNr||(d.name?d.name.replace(/\.[^.]+$/,'').toUpperCase().substring(0,12):'—');
+    var sagatavoja=d.sagatavoja||'ĀBOLTIŅA I.';
+    var apstiprinaja=d.apstiprinaja||'—';
+    return '<tr>'+
+      '<td style="text-align:center;font-size:10px;">'+kods+'</td>'+
+      '<td>&#128196; '+d.name+'</td>'+
+      '<td style="font-size:10px;">'+regNr+'</td>'+
+      '<td style="font-size:10px;">'+d.date+'</td>'+
+      '<td>'+statusBadge[status]+'</td>'+
+      '<td style="font-size:10px;">'+sendType+'</td>'+
+      '<td style="font-size:10px;">'+sagatavoja+'</td>'+
+      '<td style="font-size:10px;">'+apstiprinaja+'</td>'+
+      '</tr>';
   }).join('');
 }
 
