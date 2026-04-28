@@ -240,36 +240,24 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
       <!-- INSPECTORS -->
       <fieldset class="g">
         <legend>Inspektoru piešķiršana</legend>
-        <div style="display:flex;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-top:4px;">
 
-          <!-- Left: add inspector -->
-          <div style="min-width:220px;max-width:220px;">
-            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:4px;">Pievienot inspektoru:</div>
-            <div style="display:flex;gap:3px;margin-bottom:4px;">
-              <input class="wi" id="inspSearchInput" style="flex:1;font-size:10px;" placeholder="Vārds, uzvārds..." oninput="filterInspDB()">
-            </div>
-            <!-- DB results dropdown -->
-            <div id="inspDBList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;max-height:100px;overflow-y:auto;font-size:10px;margin-bottom:6px;">
-              <!-- filled by JS -->
-            </div>
-            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:3px;">Piešķirtie inspektori:</div>
-            <div id="assignedInspList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;min-height:40px;max-height:90px;overflow-y:auto;font-size:11px;"></div>
-            <div style="margin-top:5px;">
-              <button class="btn sm" onclick="autoDistribute()" style="width:100%;">&#9654; Sadalīt automātiski</button>
-            </div>
+          <!-- Left: inspector search + assigned list -->
+          <div style="min-width:200px;max-width:200px;">
+            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:3px;">Pievienot inspektoru:</div>
+            <input class="wi" id="inspSearchInput" style="width:100%;font-size:10px;" placeholder="Vārds, uzvārds..." oninput="filterInspDB()">
+            <div id="inspDBList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;max-height:80px;overflow-y:auto;font-size:10px;margin-top:2px;margin-bottom:5px;"></div>
+            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:2px;">Inspektori:</div>
+            <div id="assignedInspList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;min-height:36px;max-height:80px;overflow-y:auto;font-size:11px;"></div>
+            <button class="btn sm" onclick="autoDistribute()" style="width:100%;margin-top:4px;">&#9654; Sadalīt automātiski</button>
           </div>
 
-          <!-- Right: distribution table -->
+          <!-- Right: scrollable person list with checkboxes per inspector -->
           <div style="flex:1;">
-            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:4px;">Personu sadalījums:</div>
-            <table class="insp-table" id="inspTable">
-              <thead><tr>
-                <th style="width:160px;">Inspektors</th>
-                <th style="width:30px;text-align:center;">Sk.</th>
-                <th>Piešķirtās personas</th>
-              </tr></thead>
-              <tbody id="inspTbody"></tbody>
-            </table>
+            <div style="font-size:10px;font-weight:bold;color:#444;margin-bottom:3px;">Personas — piešķirt inspektoram:</div>
+            <div id="inspPersonList" style="border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;max-height:180px;overflow-y:auto;">
+              <!-- filled by JS -->
+            </div>
             <div style="font-size:10px;color:#888;margin-top:3px;" id="inspNote"></div>
           </div>
         </div>
@@ -364,19 +352,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
     <div class="vp" id="personView">
 
       <fieldset class="g">
-        <legend>Informācija par iesniedzēju</legend>
-        <div class="g4" style="margin-top:2px;">
-          <span class="rl">Uzņēmums</span><input class="wi ro" id="pNosaukums" style="width:100%;" readonly>
-          <span class="rl">Reģ. numurs</span><input class="wi ro" id="pRegNr" readonly>
-        </div>
-        <div class="g4">
-          <span class="rl">Adrese</span><input class="wi ro" id="pAdrese" style="width:100%;" readonly>
-          <span class="rl">Tālrunis</span><input class="wi ro" id="pTalrunis" readonly>
-        </div>
-      </fieldset>
-
-      <fieldset class="g">
-        <legend>A1 sertifikāta dati</legend>
+        <legend>Personas dati par kuru tiek pieprasīts A1 sertifikāts</legend>
         <div class="g4" style="margin-top:2px;">
           <span class="rl">Persona</span><input class="wi ro" id="pPersona" style="width:100%;" readonly>
           <span class="rl">Personas kods</span><input class="wi ro" id="pPersKods" readonly>
@@ -731,10 +707,9 @@ function onSelectApp(app){
 function onSelectPerson(app,p){
   selApp=app;selPerson=p;viewMode='person';
   renderList();showView('person');
-  sv('pNosaukums',app.company);sv('pRegNr',app.regNr);sv('pAdrese',app.adrese);sv('pTalrunis',app.talrunis);
   sv('pPersona',p.name);sv('pPersKods',p.kods);sv('pValsts',p.valsts);sv('pDarbsVeids',p.veids);
   sv('pPeriodsNo',p.no);sv('pPeriodsLidz',p.lidz);sv('pDarbaDev',p.devejs);
-  sv('approveDateFrom',p.no);sv('approveDateTo',p.lidz);
+  populatePersonInspDropdown();
   document.getElementById('pInspector').value=p.inspector||'';
   var b=document.getElementById('currentStatus');b.className='badge '+sBadge[p.status];b.textContent=sLbl[p.status];
   var dv=p.status==='no'?'decline':'approve';
@@ -745,6 +720,18 @@ function onSelectPerson(app,p){
   renderDocs('pDocsTbody',app.docs);
   setStatus('Izvēlēta persona: '+p.kods+' '+p.name+' ('+app.company+')');
   document.getElementById('statusSel').textContent=p.kods;
+}
+
+function populatePersonInspDropdown(){
+  var sel=document.getElementById('pInspector');
+  if(!sel)return;
+  var inspList=selApp&&selApp.selectedInspectors&&selApp.selectedInspectors.length
+    ?selApp.selectedInspectors
+    :INSP_DB.map(function(i){return i.short;});
+  sel.innerHTML='<option value="">— Nav piešķirts —</option>';
+  inspList.forEach(function(s){
+    var o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);
+  });
 }
 
 // ======= TABS =======
@@ -823,31 +810,48 @@ function autoDistribute(){
 }
 
 function renderInspTable(app){
+  var pl=document.getElementById('inspPersonList');
+  if(!pl)return;
   var sel=app.selectedInspectors||[];
-  var tb=document.getElementById('inspTbody'),note=document.getElementById('inspNote');
-  if(!tb)return;tb.innerHTML='';
-  if(!sel.length){
-    tb.innerHTML='<tr class="er"><td colspan="3">Nav pievienotu inspektoru. Izmantojiet meklēšanas lauku kreisajā pusē.</td></tr>';
-    if(note)note.textContent='';return;
+  if(!app.persons.length){
+    pl.innerHTML='<div style="padding:6px;color:#999;font-style:italic;font-size:10px;">Nav personu šajā iesniegumā.</div>';
+    if(document.getElementById('inspNote'))document.getElementById('inspNote').textContent='';
+    return;
   }
-  sel.forEach(function(insp){
-    var assigned=app.persons.filter(function(p){return p.inspector===insp;});
-    var tr=document.createElement('tr');
-    var pills=assigned.length?assigned.map(function(p){
-      return '<span style="display:inline-flex;align-items:center;gap:3px;background:#e8f0ff;border:1px solid #99aee0;padding:1px 5px;margin:1px 2px;font-size:10px;">'+
-        '<span class="sd '+sDot[p.status]+'" style="width:7px;height:7px;"></span>'+p.kods+'</span>';
-    }).join(''):'<span style="color:#999;font-style:italic;font-size:10px;">—</span>';
-    tr.innerHTML='<td><strong>'+insp+'</strong></td><td style="text-align:center;font-weight:bold;">'+assigned.length+'</td><td>'+pills+'</td>';
-    tb.appendChild(tr);
-  });
-  var total=app.persons.length,perI=sel.length?Math.ceil(total/sel.length):0;
-  if(note)note.textContent='Kopā '+total+' persona(-s), ~'+perI+' uz inspektoru. Nepiešķirtas: '+app.persons.filter(function(p){return !p.inspector;}).length+'.';
+  pl.innerHTML=app.persons.map(function(p,i){
+    var opts=sel.map(function(s){
+      return '<option value="'+s+'"'+(p.inspector===s?' selected':'')+'>'+s+'</option>';
+    }).join('');
+    return '<div style="display:grid;grid-template-columns:14px 1fr 170px;align-items:center;gap:5px;padding:3px 5px;border-bottom:1px solid #f0f0f0;background:'+(i%2?'#f8f8f8':'#fff')+';">'+
+      '<span class="sd '+sDot[p.status]+'" style="width:9px;height:9px;flex-shrink:0;"></span>'+
+      '<span style="font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+p.kods+' '+p.name+'">'+p.kods+' '+p.name+'</span>'+
+      (sel.length?
+        '<select class="ws" style="font-size:10px;height:18px;width:100%;" onchange="setPersonInspector(\''+p.kods+'\',this.value)">'+
+          '<option value="">— Nav —</option>'+opts+
+        '</select>'
+        :'<span style="font-size:10px;color:#999;font-style:italic;">Pievienojiet inspektoru</span>')+
+      '</div>';
+  }).join('');
+  var unproc=app.persons.filter(function(p){return !p.inspector;}).length;
+  if(document.getElementById('inspNote'))document.getElementById('inspNote').textContent=
+    'Kopā: '+app.persons.length+' personas. Piešķirtas: '+(app.persons.length-unproc)+'. Nepiešķirtas: '+unproc+'.';
+}
+
+function setPersonInspector(kods,inspVal){
+  if(!selApp)return;
+  var p=selApp.persons.find(function(pp){return pp.kods===kods;});
+  if(p){p.inspector=inspVal;renderList();}
+  var unproc=selApp.persons.filter(function(pp){return !pp.inspector;}).length;
+  var note=document.getElementById('inspNote');
+  if(note)note.textContent='Kopā: '+selApp.persons.length+' personas. Piešķirtas: '+(selApp.persons.length-unproc)+'. Nepiešķirtas: '+unproc+'.';
 }
 
 function assignInspector(){
   if(!selPerson)return;
   selPerson.inspector=document.getElementById('pInspector').value;
   renderList();if(selApp)renderInspTable(selApp);
+  // Also refresh person inspector dropdown to match DB
+  populatePersonInspDropdown();
 }
 
 // ======= REG DOC MODAL =======
