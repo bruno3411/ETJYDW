@@ -280,7 +280,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
                   <option value="">— Izvēlieties iemeslu —</option>
                   <option value="nav_apdros" data-law="EK Regula Nr. 883/2004, 12. pants — Norīkotie darbinieki">Persona nav sociāli apdrošināta Latvijā norīkojuma laikā</option>
                   <option value="pagajuse" data-law="Administratīvā procesa likums, 66. pants — Iesnieguma noraidīšana">Iesniegums iesniegts par jau pagājušu periodu</option>
-                  <option value="nav_reg" data-law="Sociālās apdrošināšanas likums, 7. pants — Darba devēja pienākumi">Darba devējs nav reģistrēts kā darba devējs VSAA</option>
+                  <option value="nav_reg" data-law="Sociālās apdrošināšanas likums, 7. pants — Darba devēja pienākumi">Darba devējs nav reģistrēts kā darba devējs</option>
                   <option value="vienlaicigi" data-law="EK Regula Nr. 883/2004, 13. pants — Darbība divās vai vairākās dalībvalstīs">Persona vienlaicīgi strādā mērķa dalībvalstī</option>
                   <option value="24men" data-law="EK Regula Nr. 883/2004, 12. panta 1. punkts — 24 mēnešu ierobežojums">Periods pārsniedz 24 mēnešus</option>
                   <option value="bez_dokum" data-law="EK Regula Nr. 987/2009, 19. pants — Informācijas sniegšana">Trūkst obligāto dokumentu</option>
@@ -446,7 +446,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
               <option value="">— Izvēlieties iemeslu —</option>
               <option value="nav_apdros" data-law="EK Regula Nr. 883/2004, 12. pants — Norīkotie darbinieki">Persona nav sociāli apdrošināta Latvijā norīkojuma laikā</option>
               <option value="pagajuse" data-law="Administratīvā procesa likums, 66. pants">Iesniegums iesniegts par jau pagājušu periodu</option>
-              <option value="nav_reg" data-law="Sociālās apdrošināšanas likums, 7. pants">Darba devējs nav reģistrēts kā darba devējs VSAA</option>
+              <option value="nav_reg" data-law="Sociālās apdrošināšanas likums, 7. pants">Darba devējs nav reģistrēts kā darba devējs</option>
               <option value="vienlaicigi" data-law="EK Regula Nr. 883/2004, 13. pants">Persona vienlaicīgi strādā mērķa dalībvalstī</option>
               <option value="24men" data-law="EK Regula Nr. 883/2004, 12. panta 1. punkts">Periods pārsniedz 24 mēnešus</option>
               <option value="bez_dokum" data-law="EK Regula Nr. 987/2009, 19. pants">Trūkst obligāto dokumentu</option>
@@ -469,7 +469,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
               <option>Darba līguma kopija ar darba devēju mērķa valstī</option>
               <option>Norīkojuma vēstules oriģināls ar parakstu</option>
               <option>Izziņa par sociālo apdrošināšanu iepriekšējos 2 gados</option>
-              <option>Darba devēja reģistrācijas apliecinājums VSAA</option>
+              <option>Darba devēja reģistrācijas apliecinājums</option>
             </select>
           </div>
           <div class="g2" style="margin-top:4px;"><span class="rl">Termiņš līdz</span><input class="wi" style="width:120px;" placeholder="dd.mm.gggg"></div>
@@ -626,7 +626,7 @@ var INSP_DB=[
 var apps=[
   {id:'A001',nr:'11724',date:'13.04.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz DE, LT, PL',appRegNr:'VSAA-2026-A1-11724',appRegDate:'13.04.2026',receiveType:'E-iesniegums (portāls)',
+   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz DE, LT, PL',appRegNr:'2026-A1-11724',appRegDate:'13.04.2026',receiveType:'E-iesniegums (portāls)',
    status:'proc',expanded:false,selectedInspectors:['ĀBOLTIŅA I.','KALNIŅA J.'],
    persons:[
      {name:'STEINBRUCK RALF MICHAEL',kods:'111111-11111',valsts:'Vācija (DE)',veids:'Norīkotais darbinieks',no:'01.05.2026',lidz:'31.10.2026',devejs:'Kreiss GmbH, Berlīne',iesniegts:'13.04.2026',status:'proc',inspector:'ĀBOLTIŅA I.'},
@@ -640,14 +640,14 @@ var apps=[
   },
   {id:'A002',nr:'11725',date:'12.03.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz EE',appRegNr:'VSAA-2026-A1-11725',appRegDate:'12.03.2026',receiveType:'E-iesniegums (portāls)',
+   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz EE',appRegNr:'2026-A1-11725',appRegDate:'12.03.2026',receiveType:'E-iesniegums (portāls)',
    status:'new',expanded:false,selectedInspectors:[],
    persons:[{name:'PETROV ALEKSANDR',kods:'211111-21111',valsts:'Igaunija (EE)',veids:'Norīkotais darbinieks',no:'01.04.2026',lidz:'30.09.2026',devejs:'AS Kreiss Eesti, Tallina',iesniegts:'12.03.2026',status:'new',inspector:''}],
    docs:[{name:'petrov_darba_lig.pdf',size:'189 KB',descr:'Darba līgums',date:'12.03.2026'}],responses:[]
   },
   {id:'A003',nr:'11726',date:'10.03.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz SE',appRegNr:'VSAA-2026-A1-11726',appRegDate:'10.03.2026',receiveType:'Klātienē',
+   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz SE',appRegNr:'2026-A1-11726',appRegDate:'10.03.2026',receiveType:'Klātienē',
    status:'ok',expanded:false,selectedInspectors:['ĀBOLTIŅA I.'],
    persons:[{name:'KALNIŅŠ ANDRIS',kods:'411111-41111',valsts:'Zviedrija (SE)',veids:'Norīkotais darbinieks',no:'01.04.2026',lidz:'30.09.2026',devejs:'Kreiss Sverige AB, Stokholma',iesniegts:'10.03.2026',status:'ok',inspector:'ĀBOLTIŅA I.'}],
    docs:[{name:'a1_kalnins_SE.pdf',size:'98 KB',descr:'Izsniegts A1 sertifikāts',date:'15.03.2026'}],
@@ -655,7 +655,7 @@ var apps=[
   },
   {id:'A004',nr:'11720',date:'01.02.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz AT',appRegNr:'VSAA-2026-A1-11720',appRegDate:'01.02.2026',receiveType:'Pa pastu',
+   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz AT',appRegNr:'2026-A1-11720',appRegDate:'01.02.2026',receiveType:'Pa pastu',
    status:'no',expanded:false,selectedInspectors:['STRAUTIŅŠ P.'],
    persons:[{name:'MÜLLER HANS',kods:'511111-51111',valsts:'Austrija (AT)',veids:'Norīkotais darbinieks',no:'01.01.2026',lidz:'31.01.2026',devejs:'Kreiss GmbH Wien, Vīne',iesniegts:'01.02.2026',status:'no',inspector:'STRAUTIŅŠ P.'}],
    docs:[{name:'muller_norikojums.pdf',size:'205 KB',descr:'Norīkojuma vēstule',date:'01.02.2026'}],
@@ -663,7 +663,7 @@ var apps=[
   },
   {id:'A005',nr:'11701',date:'15.01.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz NL',appRegNr:'VSAA-2026-A1-11701',appRegDate:'15.01.2026',receiveType:'E-iesniegums (portāls)',
+   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz NL',appRegNr:'2026-A1-11701',appRegDate:'15.01.2026',receiveType:'E-iesniegums (portāls)',
    status:'proc',expanded:false,selectedInspectors:['OZOLIŅA S.'],
    persons:[{name:'KOWALSKI PIOTR',kods:'611111-61111',valsts:'Nīderlande (NL)',veids:'Norīkotais darbinieks',no:'01.02.2026',lidz:'31.07.2026',devejs:'Kreiss BV, Amsterdama',iesniegts:'15.01.2026',status:'proc',inspector:'OZOLIŅA S.'}],
    docs:[{name:'kowalski_ligums.pdf',size:'312 KB',descr:'Darba līgums',date:'15.01.2026'},{name:'kreiss_bv_reg.pdf',size:'88 KB',descr:'Darba devēja reģistrācija NL',date:'15.01.2026'}],
@@ -1385,7 +1385,7 @@ function registerNewApp(){
   var nr=''+(11800+apps.length);
   var a={id:'A'+Date.now(),nr:nr,date:dt,company:co,regNr:rn,adrese:'—',talrunis:'—',
     kontakts:document.getElementById('naCt').value||'—',epasts:document.getElementById('naEm').value||'—',
-    appName:'Pieteikums A1 sertifikāta saņemšanai',appRegNr:'VSAA-'+now.getFullYear()+'-A1-'+nr,
+    appName:'Pieteikums A1 sertifikāta saņemšanai',appRegNr:now.getFullYear()+'-A1-'+nr,
     appRegDate:dt,receiveType:document.getElementById('naRt').value,
     status:'new',expanded:false,inspectorCount:parseInt(document.getElementById('naIc').value)||1,
     persons:[],docs:[],responses:[]};
