@@ -211,53 +211,72 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
 
       <fieldset class="g">
         <legend>Informācija par iesniegumu</legend>
-        <div class="g4" style="margin-top:2px;">
-          <span class="rl">Iesnieguma nosaukums</span><input class="wi ro" id="cAppName" style="width:100%;" readonly>
-          <span class="rl">Reģistrācijas numurs</span><input class="wi ro" id="cAppRegNr" readonly>
-        </div>
-        <div class="g4">
-          <span class="rl">Reģistrācijas datums</span><input class="wi ro" id="cAppRegDate" style="width:130px;" readonly>
-          <span class="rl">Iesniegšanas veids</span>
-          <select class="ws" id="cDocIesnVeids" style="width:100%;font-size:11px;height:21px;">
-            <option>Personīgi, uzrādot pasi</option>
-            <option>Pa pastu</option>
-            <option>E-pasts</option>
-            <option>Portāls latvija.lv</option>
-            <option>Klātienē, ar pilnvaru</option>
-          </select>
-        </div>
-        <div class="g4">
-          <span class="rl">Personu skaits</span><input class="wi ro" id="cAppPersonCount" style="width:50px;" readonly>
-          <span class="rl">Neapstrādāto personu skaits</span><input class="wi ro" id="cAppUnprocessed" style="width:50px;" readonly>
-        </div>
-        <div class="g4">
-          <span class="rl">Reg. Nr. Lietvedībā</span><input class="wi" id="cDocRegNr" style="width:140px;" placeholder="26/572786">
-          <span class="rl">Saņemšanas datums</span>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <input class="wi" id="cDocDatums" style="width:90px;" placeholder="24.04.2026.">
-            <label style="display:flex;align-items:center;gap:3px;font-size:11px;cursor:pointer;"><input type="radio" name="cDocOrigKop" value="orig" checked> Oriģināls</label>
-            <label style="display:flex;align-items:center;gap:3px;font-size:11px;cursor:pointer;"><input type="radio" name="cDocOrigKop" value="kop"> Kopija</label>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:160px 1fr 190px 1fr;gap:4px;align-items:center;margin-top:3px;">
-          <span class="rl">Lēmuma nosūtīšanas veids</span>
-          <select class="ws" id="cSendType" style="width:100%;">
-            <option>E-pasts</option>
-            <option>Pa pastu</option>
-            <option>Portāls latvija.lv</option>
-            <option>Klātienē</option>
-            <option>Fakss</option>
-          </select>
-          <span class="rl">Inf. par apstrādi tiks nosūtīta</span>
-          <input class="wi" id="cSendTo" placeholder="e-pasts vai adrese...">
-        </div>
+        <table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:11px;">
+          <col style="width:155px;"><col style="width:1fr;"><col style="width:145px;"><col>
+          <!-- Row 1: full-width title -->
+          <tr>
+            <td class="rl" style="padding:2px 4px;">Iesniegums</td>
+            <td colspan="3" style="padding:2px 4px;">
+              <input class="wi ro" id="cAppFullTitle" style="width:100%;" readonly placeholder="Kods — Nosaukums">
+              <input class="wi ro" id="cAppRegNr" style="display:none;" readonly>
+              <input class="wi ro" id="cAppName" style="display:none;" readonly>
+            </td>
+          </tr>
+          <!-- Row 2 -->
+          <tr>
+            <td class="rl" style="padding:2px 4px;">Reģistrācijas datums</td>
+            <td style="padding:2px 4px;"><input class="wi ro" id="cAppRegDate" style="width:120px;" readonly></td>
+            <td class="rl" style="padding:2px 4px;">Iesniegšanas veids</td>
+            <td style="padding:2px 4px;">
+              <select class="ws" id="cDocIesnVeids" style="width:100%;">
+                <option>Personīgi, uzrādot pasi</option>
+                <option>Pa pastu</option>
+                <option>E-pasts</option>
+                <option>Portāls latvija.lv</option>
+                <option>Klātienē, ar pilnvaru</option>
+              </select>
+            </td>
+          </tr>
+          <!-- Row 3 -->
+          <tr>
+            <td class="rl" style="padding:2px 4px;">Personu skaits</td>
+            <td style="padding:2px 4px;"><input class="wi ro" id="cAppPersonCount" style="width:60px;" readonly></td>
+            <td class="rl" style="padding:2px 4px;">Neapstrādāto</td>
+            <td style="padding:2px 4px;"><input class="wi ro" id="cAppUnprocessed" style="width:60px;" readonly></td>
+          </tr>
+          <!-- Row 4 -->
+          <tr>
+            <td class="rl" style="padding:2px 4px;">Reģistrācijas Nr. ISS</td>
+            <td style="padding:2px 4px;"><input class="wi" id="cDocRegNr" style="width:100%;" placeholder="26/572786"></td>
+            <td class="rl" style="padding:2px 4px;">Reģistrācijas Nr. / SAIS</td>
+            <td style="padding:2px 4px;"><input class="wi" id="cDocRegNrSais" style="width:100%;" placeholder=""></td>
+          </tr>
+          <!-- Row 5 -->
+          <tr>
+            <td class="rl" style="padding:2px 4px;">Lēmuma nosūtīšanas veids</td>
+            <td style="padding:2px 4px;">
+              <select class="ws" id="cSendType" style="width:100%;">
+                <option>E-pasts</option><option>Pa pastu</option><option>Portāls latvija.lv</option><option>Klātienē</option><option>Fakss</option>
+              </select>
+            </td>
+            <td class="rl" style="padding:2px 4px;">Inf. par apstrādi tiks nosūtīta</td>
+            <td style="padding:2px 4px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <label style="display:flex;align-items:center;gap:3px;cursor:pointer;white-space:nowrap;"><input type="radio" name="notifType" value="sms"> SMS</label>
+                <label style="display:flex;align-items:center;gap:3px;cursor:pointer;white-space:nowrap;"><input type="radio" name="notifType" value="epasts" checked> E-pasts</label>
+                <input class="wi" id="cSendTo" style="flex:1;" placeholder="e-pasts / tālrunis">
+              </div>
+            </td>
+          </tr>
+        </table>
       </fieldset>
 
       <!-- TABS -->
       <div id="cTabsBlock">
         <!-- Tab buttons row -->
         <div style="display:flex;align-items:flex-end;gap:0;margin-bottom:0;padding-left:2px;">
-          <div class="ctab active" id="ctab_atteikt" onclick="switchCTab('atteikt')">Atteikt iesniegumu</div>
+          <div class="ctab active" id="ctab_devejs" onclick="switchCTab('devejs')">Darba devēja raksturojums</div>
+          <div class="ctab" id="ctab_atteikt" onclick="switchCTab('atteikt')">Atteikt iesniegumu</div>
           <div class="ctab" id="ctab_docs" onclick="switchCTab('docs')">Iesniegumam pievienotie dokumenti</div>
           <div class="ctab" id="ctab_resp" onclick="switchCTab('resp')">Sagatavotās atbildes</div>
           <div class="ctab" id="ctab_insp" onclick="switchCTab('insp')">Inspektori</div>
@@ -266,7 +285,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
         <div class="ctab-body">
 
           <!-- TAB: Atteikt -->
-          <div class="ctab-panel active" id="cpanel_atteikt">
+          <div class="ctab-panel" id="cpanel_atteikt">
             <div style="padding:4px 0 6px;">
               <label class="fl" style="gap:6px;cursor:pointer;">
                 <input type="checkbox" id="atteiktChk" onchange="toggleAtteikt()">
@@ -341,6 +360,25 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
             </div>
           </div>
 
+          <!-- TAB: Darba devēja raksturojums -->
+          <div class="ctab-panel active" id="cpanel_devejs">
+            <fieldset class="g" style="border:none;padding:0;">
+              <div style="font-weight:bold;font-size:11px;margin-bottom:6px;color:#0a246a;">Iepriekš saņemtie iesniegumi no šī darba devēja:</div>
+              <table class="wt" id="prevAppsTbl">
+                <thead><tr>
+                  <th style="width:80px;">Nr.</th>
+                  <th style="width:100px;">Datums</th>
+                  <th>Iesnieguma nosaukums</th>
+                  <th style="width:80px;">Personu sk.</th>
+                  <th style="width:80px;">Statuss</th>
+                </tr></thead>
+                <tbody id="prevAppsTbody">
+                  <tr class="er"><td colspan="5">Nav iepriekšēju iesniegumu</td></tr>
+                </tbody>
+              </table>
+            </fieldset>
+          </div>
+
           <!-- TAB: Inspektori -->
           <div class="ctab-panel" id="cpanel_insp">
             <div style="display:flex;gap:0;border:1px solid #b0b0b0;">
@@ -393,11 +431,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
         </div>
         <div class="g4">
           <span class="rl">Dzimšanas datums</span><input class="wi ro" id="pDzimDat" style="width:120px;" readonly>
-          <span class="rl">Miršanas datums</span>
-          <div style="display:flex;align-items:center;gap:5px;">
-            <input class="wi" id="pMirsDat" style="width:110px;" placeholder="—">
-            <span id="pMirsAlert" style="display:none;color:#cc0000;font-weight:bold;font-size:10px;">⚠ Miris</span>
-          </div>
+          <span class="rl"></span><span></span>
         </div>
         <div class="g4">
           <span class="rl">Darba valsts</span><input class="wi ro" id="pValsts" style="width:100%;" readonly>
@@ -493,7 +527,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
         </tr></thead><tbody id="pRespTbody"></tbody></table>
         <div style="display:flex;gap:4px;margin-top:4px;">
           <button class="btn" onclick="viewSelectedResp('p')">Apskatīt atbildi</button>
-          <button class="btn" onclick="deleteDocument()">Dzēst...</button>
+          <button class="btn" onclick="deleteDocument()">Anulēt</button>
           <button class="btn" style="margin-left:auto;" onclick="generateDoc()">Ģenerēt dokumentu</button>
         </div>
       </fieldset>
@@ -735,6 +769,7 @@ function onSelectApp(app){
   sv('cNosaukums',app.company);sv('cRegNr',app.regNr);sv('cAdrese',app.adrese);
   sv('cTalrunis',app.talrunis);sv('cKontakts',app.kontakts);sv('cEpasts',app.epasts);
   sv('cAppName',app.appName);sv('cAppRegNr',app.appRegNr);
+  sv('cAppFullTitle',app.appRegNr+'  —  '+app.appName);
   sv('cAppRegDate',app.appRegDate);sv('cAppReceiveType',app.receiveType);
   sv('cAppPersonCount',app.persons.length);
   sv('cAppUnprocessed',app.persons.filter(function(p){return p.status==='new'||p.status==='proc';}).length);
@@ -748,6 +783,7 @@ function onSelectApp(app){
   renderDocs('cDocsTbody',app.docs);
   renderResponses('cRespTbody',app.responses,app,'c');
   selectedRespIdx.c=-1;
+  renderPrevApps(app);
   setStatus('Izvēlēts iesniegums: '+app.nr+' — '+app.company);
   document.getElementById('statusSel').textContent='Nr: '+app.nr;
 }
@@ -818,28 +854,40 @@ function renderPersonDecisionInfo(app, p){
   }
 
   if(p.status==='ok'){
-    // Approved — build from approval data
-    var dateFrom=p.approvedFrom||p.no||'—';
-    var dateTo=p.approvedTo||p.lidz||'—';
-    var breakFrom=p.breakFrom||'—';
-    var breakTo=p.breakTo||'—';
-    var countries=p.countries||[p.valsts||'—'];
-    box.innerHTML=
-      '<div style="display:grid;grid-template-columns:160px 1fr;gap:5px;align-items:flex-start;">'+
-      '<span style="text-align:right;font-weight:bold;">Lēmuma veids</span>'+
-      '<span class="badge bo">Apstiprināts</span>'+
-      '<span style="text-align:right;font-weight:bold;">Sākuma datums</span>'+
-      '<span>'+dateFrom+'</span>'+
-      '<span style="text-align:right;font-weight:bold;">Beigu datums</span>'+
-      '<span>'+dateTo+'</span>'+
-      '<span style="text-align:right;font-weight:bold;">Pārtraukuma sākums</span>'+
-      '<input class="wi" style="width:120px;" value="'+breakFrom+'" onchange="if(selPerson)selPerson.breakFrom=this.value" placeholder="—">'+
-      '<span style="text-align:right;font-weight:bold;">Pārtraukuma beigas</span>'+
-      '<input class="wi" style="width:120px;" value="'+breakTo+'" onchange="if(selPerson)selPerson.breakTo=this.value" placeholder="—">'+
-      '<span style="text-align:right;font-weight:bold;align-self:flex-start;padding-top:2px;">Norīkojuma valstis</span>'+
-      '<div id="pCountriesList">'+renderCountriesList(countries)+'</div>'+
-      '</div>'+
-      '<div style="margin-top:6px;"><button class="btn sm" onclick="addCountry()">+ Pievienot valsti</button></div>';
+    if(!p.a1Periods)p.a1Periods=[{from:p.approvedFrom||p.no,to:p.approvedTo||p.lidz,countries:p.countries||[p.valsts||'—'],breakPeriods:[]}];
+    var html='<div style="font-weight:bold;font-size:11px;margin-bottom:5px;">A1 periodi:</div>';
+    p.a1Periods.forEach(function(per,pi){
+      html+='<div style="border:1px solid #c0d0c0;background:#f5fff5;padding:5px 7px;margin-bottom:6px;">';
+      html+='<div style="display:grid;grid-template-columns:140px 1fr 140px 1fr;gap:4px;align-items:center;margin-bottom:3px;">'+
+        '<span style="text-align:right;font-weight:bold;">Periods nr.'+(pi+1)+'</span><span></span>'+
+        '<span></span><span></span>'+
+        '<span style="text-align:right;">Sākuma datums</span><input class="wi" style="width:110px;" value="'+(per.from||'')+'">'+
+        '<span style="text-align:right;">Beigu datums</span><input class="wi" style="width:110px;" value="'+(per.to||'')+'">'+
+      '</div>';
+      // Countries
+      html+='<div style="margin:3px 0 2px;font-size:10px;font-weight:bold;">Norīkojuma valstis:</div>';
+      html+='<div id="a1_countries_'+pi+'">';
+      (per.countries||[]).forEach(function(c,ci){
+        html+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">'+
+          '<input class="wi" style="width:160px;" value="'+c+'">'+
+          '<button class="btn sm" onclick="removeA1Country('+pi+','+ci+')">✕</button></div>';
+      });
+      html+='</div><button class="btn sm" onclick="addA1Country('+pi+')" style="margin-top:2px;">+ Valsts</button>';
+      // Break periods
+      html+='<div style="margin:5px 0 2px;font-size:10px;font-weight:bold;">Pārtraukuma periodi:</div>';
+      if(per.breakPeriods&&per.breakPeriods.length){
+        per.breakPeriods.forEach(function(bp,bi){
+          html+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">'+
+            '<input class="wi" style="width:100px;" value="'+(bp.from||'')+'"> — '+
+            '<input class="wi" style="width:100px;" value="'+(bp.to||'')+'">'+
+            '<button class="btn sm" onclick="removeBreakPeriod('+pi+','+bi+')">✕</button></div>';
+        });
+      } else { html+='<span style="font-size:10px;color:#999;font-style:italic;">Nav pārtraukuma periodu</span>'; }
+      html+='<button class="btn sm" onclick="addBreakPeriod('+pi+')" style="margin-top:2px;">+ Pārtraukums</button>';
+      html+='</div>';
+    });
+    html+='<button class="btn sm nw" onclick="addA1Period()">+ Pievienot A1 periodu</button>';
+    box.innerHTML=html;
     return;
   }
 }
@@ -941,12 +989,34 @@ function populatePersonInspDropdown(){
 
 // ======= TABS =======
 function switchCTab(name){
-  ['atteikt','docs','resp','insp'].forEach(function(t){
+  ['atteikt','docs','resp','insp','devejs'].forEach(function(t){
     document.getElementById('ctab_'+t).className='ctab'+(t===name?' active':'');
     document.getElementById('cpanel_'+t).className='ctab-panel'+(t===name?' active':'');
   });
   if(name==='insp'&&selApp) renderInspTabPanel(selApp);
+  if(name==='devejs'&&selApp) renderPrevApps(selApp);
 }
+
+function renderPrevApps(app){
+  var tb=document.getElementById('prevAppsTbody');
+  if(!tb)return;
+  var others=apps.filter(function(a){return a.id!==app.id&&a.regNr===app.regNr;});
+  if(!others.length){
+    tb.innerHTML='<tr class="er"><td colspan="5">Nav iepriekšēju iesniegumu no šī darba devēja.</td></tr>';
+    return;
+  }
+  var rows=others.map(function(a){
+    var tr=document.createElement('tr');tr.style.cursor='pointer';
+    tr.innerHTML='<td>'+a.nr+'</td><td>'+a.date+'</td><td>'+a.appName+'</td>'+
+      '<td style="text-align:center;">'+a.persons.length+'</td>'+
+      '<td><span class="badge '+sBadge[a.status]+'">'+sLbl[a.status]+'</span></td>';
+    tr.addEventListener('click',function(){onSelectApp(getAppById(a.id));});
+    return tr.outerHTML;
+  });
+  tb.innerHTML=rows.join('');
+}
+
+function getAppById(id){return apps.find(function(a){return a.id===id;});}
 
 // ======= INSPECTOR DB =======
 function populateInspAddSelect(){
@@ -1417,6 +1487,33 @@ function postponeApp(){if(viewMode!=='person'){showInfo('Kļūda','Izvēlieties 
 function viewDocument(){if(!selApp)return;showInfo('Dokumenta apskate','Dokuments tiek atvērts skatīšanai...');}
 function deleteDocument(){if(!selApp)return;if(confirm('Dzēst izvēlēto dokumentu?'))showNotif('Dzēsts','Dokuments dzēsts.');}
 function generateDoc(){if(!selApp)return;showNotif('Ģenerēts','Dokuments sagatavots un pievienots atbilžu sarakstam.');}
+
+function addA1Period(){
+  if(!selPerson)return;
+  if(!selPerson.a1Periods)selPerson.a1Periods=[];
+  selPerson.a1Periods.push({from:'',to:'',countries:[''],breakPeriods:[]});
+  renderPersonDecisionInfo(selApp,selPerson);
+}
+function addA1Country(pi){
+  if(!selPerson||!selPerson.a1Periods||!selPerson.a1Periods[pi])return;
+  selPerson.a1Periods[pi].countries.push('');
+  renderPersonDecisionInfo(selApp,selPerson);
+}
+function removeA1Country(pi,ci){
+  if(!selPerson||!selPerson.a1Periods||!selPerson.a1Periods[pi])return;
+  selPerson.a1Periods[pi].countries.splice(ci,1);
+  renderPersonDecisionInfo(selApp,selPerson);
+}
+function addBreakPeriod(pi){
+  if(!selPerson||!selPerson.a1Periods||!selPerson.a1Periods[pi])return;
+  selPerson.a1Periods[pi].breakPeriods.push({from:'',to:''});
+  renderPersonDecisionInfo(selApp,selPerson);
+}
+function removeBreakPeriod(pi,bi){
+  if(!selPerson||!selPerson.a1Periods||!selPerson.a1Periods[pi])return;
+  selPerson.a1Periods[pi].breakPeriods.splice(bi,1);
+  renderPersonDecisionInfo(selApp,selPerson);
+}
 
 function updateClock(){
   var n=new Date();
