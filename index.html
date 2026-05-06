@@ -351,7 +351,8 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
               <th>Atbildes dokumenta veids</th>
               <th style="width:110px;">Nosūtīšanas veids</th>
               <th style="width:100px;">Nosūtīšanas datums</th>
-              <th style="width:90px;">Personas</th>
+              <th style="width:90px;">Periods no</th>
+              <th style="width:90px;">Periods līdz</th>
             </tr></thead><tbody id="cRespTbody"></tbody></table>
             <div style="display:flex;gap:4px;margin-top:6px;">
               <button class="btn" onclick="viewSelectedResp('c')">Apskatīt atbildi</button>
@@ -498,6 +499,8 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <th>Atbildes dokumenta veids</th>
           <th style="width:120px;">Nosūtīšanas veids</th>
           <th style="width:110px;">Nosūtīšanas datums</th>
+          <th style="width:90px;">Periods no</th>
+          <th style="width:90px;">Periods līdz</th>
         </tr></thead><tbody id="pRespTbody"></tbody></table>
         <div style="display:flex;gap:4px;margin-top:4px;">
           <button class="btn" onclick="viewSelectedResp('p')">Apskatīt atbildi</button>
@@ -507,9 +510,19 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
 
       <!-- PERSON DECISION INFO -->
       <fieldset class="g" id="pDecisionInfoBlock">
-        <legend>Informācija par sagatavoto atbildi</legend>
+        <legend>Pārtraukuma periodi</legend>
         <div id="pDecisionInfo" style="padding:4px 0;">
-          <div style="color:#999;font-style:italic;font-size:11px;">Nav pieņemta lēmuma.</div>
+          <div style="max-height:72px;overflow-y:auto;border:2px solid;border-color:#808080 #fff #fff #808080;"><table style="width:100%;border-collapse:collapse;font-size:11px;">
+            <thead>
+              <tr style="background:#d4d0c8;border-bottom:1px solid #808080;">
+                <th style="padding:2px 8px;font-weight:normal;text-align:left;width:180px;">Sākuma datums</th>
+                <th style="padding:2px 8px;font-weight:normal;text-align:left;width:180px;">Beigu datums</th>
+                <th style="padding:2px 8px;font-weight:normal;text-align:left;"></th>
+              </tr>
+            </thead>
+            <tbody id="pBreakPeriodsTbody"></tbody>
+          </table></div>
+          <button class="btn sm nw" onclick="addPersonBreakPeriod()" style="margin-top:5px;">+ Pievienot pārtraukuma periodu</button>
         </div>
       </fieldset>
 
@@ -715,7 +728,7 @@ var apps=[
    appName:'Iesniegums sociāli apdrošināmās personas statusa saglabāšanai Latvijā',appRegNr:'2026-A1-11724',appRegDate:'13.04.2026',receiveType:'E-iesniegums (portāls)',
    status:'proc',expanded:false,selectedInspectors:['ĀBOLTIŅA I.','KALNIŅA J.'],
    persons:[
-     {name:'MIKE WAZOWSKI',kods:'291011-12345',valsts:'Vācija (DE)',veids:'Norīkotais darbinieks',no:'01.05.2026',lidz:'31.10.2026',devejs:'Kreiss GmbH, Berlīne',iesniegts:'13.04.2026',status:'proc',inspector:'ĀBOLTIŅA I.'},
+     {name:'MIKE WAZOWSKI',kods:'291011-12345',valsts:'Vācija (DE)',veids:'Norīkotais darbinieks',no:'01.05.2026',lidz:'31.10.2026',devejs:'Kreiss GmbH, Berlīne',iesniegts:'13.04.2026',status:'proc',inspector:'ĀBOLTIŅA I.',breakPeriods:[{from:'10.06.2026',to:'25.06.2026'},{from:'15.07.2026',to:'20.07.2026'},{from:'01.09.2026',to:'05.09.2026'}]},
      {name:'BUZZ LIGHTYEAR',kods:'311111-11112',valsts:'Lietuva (LT)',veids:'Norīkotais darbinieks',no:'15.05.2026',lidz:'15.11.2026',devejs:'UAB Kreiss, Viļņa',iesniegts:'13.04.2026',status:'proc',inspector:'KALNIŅA J.'},
      {name:'BĒRZIŅŠ JĀNIS',kods:'311111-11113',valsts:'Polija (PL)',veids:'Sezonālais darbs',no:'01.06.2026',lidz:'31.08.2026',devejs:'Kreiss Sp.z.o.o., Varšava',iesniegts:'13.04.2026',status:'new',inspector:''}
    ],
@@ -740,7 +753,7 @@ var apps=[
        {from:'01.04.2026',to:'30.09.2026',countries:['Zviedrija'],breakPeriods:[{from:'15.06.2026',to:'30.06.2026'}]}
      ]}],
    docs:[{name:'a1_kalnins_SE.pdf',size:'98 KB',descr:'Izsniegts A1 sertifikāts',date:'15.03.2026'}],
-   responses:[{prepDate:'15.03.2026 09:05',regNr:'ATB-2026-11726-01',docType:'A1 sertifikāts',sendType:'E-pasts',sendDate:'15.03.2026',persons:['411111-41111']}]
+   responses:[{prepDate:'15.03.2026 09:05',regNr:'ATB-2026-11726-01',docType:'A1 sertifikāts',sendType:'E-pasts',sendDate:'15.03.2026',periodFrom:'01.04.2026',periodTo:'30.09.2026',persons:['411111-41111']}]
   },
   {id:'A004',nr:'11720',date:'01.02.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
@@ -748,7 +761,7 @@ var apps=[
    status:'no',expanded:false,selectedInspectors:['STRAUTIŅŠ P.'],
    persons:[{name:'MÜLLER HANS',kods:'511111-51111',valsts:'Austrija (AT)',veids:'Norīkotais darbinieks',no:'01.01.2026',lidz:'31.01.2026',devejs:'Kreiss GmbH Wien, Vīne',iesniegts:'01.02.2026',status:'no',inspector:'STRAUTIŅŠ P.'}],
    docs:[{name:'muller_norikojums.pdf',size:'205 KB',descr:'Norīkojuma vēstule',date:'01.02.2026'}],
-   responses:[{prepDate:'10.02.2026 10:00',regNr:'ATB-2026-11720-01',docType:'Noraidījuma lēmums',sendType:'E-pasts',sendDate:'10.02.2026',persons:['511111-51111']}]
+   responses:[{prepDate:'10.02.2026 10:00',regNr:'ATB-2026-11720-01',docType:'Noraidījuma lēmums',sendType:'E-pasts',sendDate:'10.02.2026',periodFrom:'—',periodTo:'—',persons:['511111-51111']}]
   },
   {id:'A005',nr:'11701',date:'15.01.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
@@ -880,7 +893,7 @@ function onSelectPerson(app,p){
   selectedRespIdx.p=-1;
   renderDocs('pDocsTbody',app.docs);
   checkAutoDeny();
-  renderPersonDecisionInfo(app, p);
+  renderPersonBreakPeriods(p);
   setStatus('Izvēlēta persona: '+p.kods+' '+p.name+' ('+app.company+')');
   document.getElementById('statusSel').textContent=p.kods;
 }
@@ -1388,14 +1401,16 @@ function renderDocs(id,docs){
 
 function renderResponses(tbodyId,resp,app,panel){
   var tb=document.getElementById(tbodyId);
-  if(!resp||!resp.length){tb.innerHTML='<tr class="er"><td colspan="6">Nav sagatavotu atbilžu</td></tr>';return;}
+  if(!resp||!resp.length){tb.innerHTML='<tr class="er"><td colspan="8">Nav sagatavotu atbilžu</td></tr>';return;}
   tb.innerHTML='';
   resp.forEach(function(r,idx){
     var tr=document.createElement('tr');
     tr.id='resp_'+panel+'_'+idx;
     tr.innerHTML='<td style="text-align:center;"><span style="cursor:pointer;font-size:10px;" onclick="toggleRespPersons(\''+panel+'\','+idx+')">&#9658;</span></td>'+
       '<td>'+r.prepDate+'</td><td>'+r.regNr+'</td><td>'+r.docType+'</td>'+
-      '<td>'+r.sendType+'</td><td>'+r.sendDate+'</td>';
+      '<td>'+r.sendType+'</td><td>'+r.sendDate+'</td>'+
+      '<td style="font-size:10px;">'+(r.periodFrom||'—')+'</td>'+
+      '<td style="font-size:10px;">'+(r.periodTo||'—')+'</td>';
     tr.addEventListener('click',function(){selectedRespIdx[panel]=idx;highlightResp(panel,idx);});
     tb.appendChild(tr);
     // expand row for persons
@@ -1416,7 +1431,7 @@ function renderResponses(tbodyId,resp,app,panel){
         '<span class="badge '+sBadge[p.status]+'" style="margin-left:4px;">'+sLbl[p.status]+'</span>'+
         '</div>';
     }).join(''):'<div style="color:#999;font-style:italic;padding:4px;">Nav piesaistītu personu</div>';
-    expTr.innerHTML='<td colspan="6"><div class="resp-persons">'+pHtml+'</div></td>';
+    expTr.innerHTML='<td colspan="8"><div class="resp-persons">'+pHtml+'</div></td>';
     tb.appendChild(expTr);
   });
 }
@@ -1594,6 +1609,35 @@ function addPersonCountry(){
   if(!selPerson.valstis)selPerson.valstis=[];
   renderPersonCountries(selPerson);
 }
+
+function addPersonBreakPeriod(){
+  if(!selPerson)return;
+  if(!selPerson.breakPeriods)selPerson.breakPeriods=[];
+  selPerson.breakPeriods.push({from:'',to:''});
+  renderPersonBreakPeriods(selPerson);
+}
+
+function renderPersonBreakPeriods(p){
+  p=p||selPerson;
+  var tb=document.getElementById('pBreakPeriodsTbody');
+  if(!tb)return;
+  var bps=p&&p.breakPeriods?p.breakPeriods:[];
+  if(!bps.length){
+    tb.innerHTML='<tr class="er"><td colspan="3" style="padding:4px 8px;color:#999;font-style:italic;">Nav pārtraukuma periodu.</td></tr>';
+    return;
+  }
+  tb.innerHTML=bps.map(function(bp,i){
+    var bg=i%2?'#f8f8f8':'#fff';
+    return '<tr style="background:'+bg+';border-bottom:1px solid #efefef;">'+
+      '<td style="padding:3px 8px;width:180px;"><input class="wi" style="width:130px;" value="'+(bp.from||'')+'" placeholder="dd.mm.gggg" onchange="updateBreakPeriod('+i+',\'from\',this.value)"></td>'+
+      '<td style="padding:3px 8px;width:180px;"><input class="wi" style="width:130px;" value="'+(bp.to||'')+'" placeholder="dd.mm.gggg" onchange="updateBreakPeriod('+i+',\'to\',this.value)"></td>'+
+      '<td style="padding:3px 6px;"><button class="btn sm" onclick="deleteBreakPeriod('+i+')">&#x2715;</button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+function updateBreakPeriod(i,field,val){if(selPerson&&selPerson.breakPeriods&&selPerson.breakPeriods[i])selPerson.breakPeriods[i][field]=val;}
+function deleteBreakPeriod(i){if(selPerson&&selPerson.breakPeriods){selPerson.breakPeriods.splice(i,1);renderPersonBreakPeriods();}}
 
 function addA1Period(){
   if(!selPerson)return;
