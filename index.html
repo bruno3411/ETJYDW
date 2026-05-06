@@ -85,9 +85,9 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
 .lok{color:#006600;font-weight:bold;}.lno{color:#880000;font-weight:bold;}.lwt{color:#884400;}
 .ds{display:none;border:1px solid;padding:6px;margin-top:4px;}
 .ds.show{display:block;}
-#declineSection{border-color:#cc8888;background:#fff8f6;}
+#declineSection{border-color:#c0bdb5;background:#f8f8f5;}
 #pendingSection{border-color:#ccaa66;background:#fffbf0;}
-.atts{display:none;padding:6px;border:1px solid #cc8888;background:#fff8f6;margin-top:4px;}
+.atts{display:none;padding:6px;border:1px solid #c0bdb5;background:#f8f8f5;margin-top:4px;}
 .atts.show{display:block;}
 /* inspector section */
 .insp-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px;}
@@ -195,16 +195,20 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
       <fieldset class="g">
         <legend>Informācija par iesniedzēju</legend>
         <div class="g4" style="margin-top:2px;">
-          <span class="rl">Nosaukums</span><input class="wi ro" id="cNosaukums" style="width:100%;" readonly>
-          <span class="rl">Reģ. numurs</span><input class="wi ro" id="cRegNr" readonly>
+          <span class="rl" id="lblNosaukums">Nosaukums</span><input class="wi ro" id="cNosaukums" style="width:100%;" readonly>
+          <span class="rl" id="lblRegNr">Reģ. numurs</span><input class="wi ro" id="cRegNr" readonly>
         </div>
         <div class="g4">
-          <span class="rl">Juridiskā adrese</span><input class="wi ro" id="cAdrese" style="width:100%;" readonly>
+          <span class="rl" id="lblAdrese">Juridiskā adrese</span><input class="wi ro" id="cAdrese" style="width:100%;" readonly>
           <span class="rl">Tālrunis</span><input class="wi ro" id="cTalrunis" readonly>
         </div>
-        <div class="g4">
+        <div class="g4" id="cKontaktsRow">
           <span class="rl">Kontaktpersona</span><input class="wi ro" id="cKontakts" style="width:100%;" readonly>
           <span class="rl">E-pasts</span><input class="wi ro" id="cEpasts" readonly>
+        </div>
+        <div class="g4" id="cEpastsOnlyRow" style="display:none;">
+          <span class="rl"></span><span></span>
+          <span class="rl">E-pasts</span><input class="wi ro" id="cEpastsOnly" readonly>
         </div>
       </fieldset>
 
@@ -274,9 +278,9 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
       <div id="cTabsBlock">
         <!-- Tab buttons row -->
         <div style="display:flex;align-items:flex-end;gap:0;margin-bottom:0;padding-left:2px;">
-          <div class="ctab active" id="ctab_devejs" onclick="switchCTab('devejs')">Darba devēja raksturojums</div>
+          <div class="ctab active" id="ctab_docs" onclick="switchCTab('docs')">Iesniegumam pievienotie dokumenti</div>
+          <div class="ctab" id="ctab_devejs" onclick="switchCTab('devejs')">Darba devēja raksturojums</div>
           <div class="ctab" id="ctab_atteikt" onclick="switchCTab('atteikt')">Sagatavot atteikumu</div>
-          <div class="ctab" id="ctab_docs" onclick="switchCTab('docs')">Iesniegumam pievienotie dokumenti</div>
           <div class="ctab" id="ctab_resp" onclick="switchCTab('resp')">Sagatavotās atbildes</div>
           <div class="ctab" id="ctab_insp" onclick="switchCTab('insp')">Inspektori</div>
         </div>
@@ -311,14 +315,14 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
                 <input class="wi" id="tiesiskaisInput" style="width:100%;" placeholder="Tiek aizpildīts automātiski...">
               </div>
               <div class="g2" style="margin-top:4px;">
-                <span class="rl" style="padding-top:3px;">Komentārs</span>
-                <textarea class="wta" rows="2" style="width:100%;" placeholder="Papildu paskaidrojums..."></textarea>
+                <span class="rl" style="padding-top:3px;">Pamatojums brīvā tekstā</span>
+                <textarea class="wta" rows="2" style="width:100%;" placeholder="Pamatojums brīvā tekstā..."></textarea>
               </div>
             </div>
           </div>
 
           <!-- TAB: Dokumenti -->
-          <div class="ctab-panel" id="cpanel_docs">
+          <div class="ctab-panel active" id="cpanel_docs">
             <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:4px;gap:8px;">
               <label class="fl" style="gap:5px;cursor:pointer;font-size:11px;"><input type="checkbox" id="cOnlyReply"> Tikai atbilde uz saņemto dokumentu</label>
             </div>
@@ -356,8 +360,17 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           </div>
 
           <!-- TAB: Darba devēja raksturojums -->
-          <div class="ctab-panel active" id="cpanel_devejs">
+          <div class="ctab-panel" id="cpanel_devejs">
             <fieldset class="g" style="border:none;padding:0;">
+              <div style="display:grid;grid-template-columns:160px 120px 160px 140px;gap:4px;align-items:center;margin-bottom:8px;">
+                <span class="rl">Darbinieku skaits</span>
+                <input class="wi" id="devDarbSkaits" style="width:100%;" placeholder="0">
+                <span class="rl">Iemaksas kalendārā gadā</span>
+                <input class="wi" id="devIemaksas" style="width:100%;" placeholder="0.00 EUR">
+                <span class="rl">Nokontētas iemaksas</span>
+                <input class="wi" id="devNokont" style="width:100%;" placeholder="0.00 EUR">
+                <span></span><span></span>
+              </div>
               <div style="font-weight:bold;font-size:11px;margin-bottom:6px;color:#0a246a;">Iepriekš saņemtie iesniegumi no šī darba devēja:</div>
               <table class="wt" id="prevAppsTbl">
                 <thead><tr>
@@ -420,28 +433,83 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
 
       <fieldset class="g">
         <legend>Personas dati par kuru tiek pieprasīts A1 sertifikāts</legend>
-        <div class="g4" style="margin-top:2px;">
-          <span class="rl">Persona</span><input class="wi ro" id="pPersona" style="width:100%;" readonly>
-          <span class="rl">Personas kods</span><input class="wi ro" id="pPersKods" readonly>
+        <table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:11px;">
+          <col style="width:130px;"><col><col style="width:130px;"><col>
+          <tr>
+            <td class="rl" style="padding:2px 5px;">Persona</td>
+            <td colspan="3" style="padding:2px 5px;"><input class="wi ro" id="pPersona" style="width:100%;" readonly></td>
+          </tr>
+          <tr>
+            <td class="rl" style="padding:2px 5px;">Personas kods</td>
+            <td style="padding:2px 5px;"><input class="wi ro" id="pPersKods" style="width:130px;" readonly></td>
+            <td class="rl" style="padding:2px 5px;">Dzimšanas datums</td>
+            <td style="padding:2px 5px;"><input class="wi ro" id="pDzimDat" style="width:120px;" readonly></td>
+          </tr>
+          <tr>
+            <td class="rl" style="padding:2px 5px;vertical-align:top;padding-top:6px;">Darba valsts(-is)</td>
+            <td colspan="3" style="padding:2px 5px;">
+              <div id="pValstsList" style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px 6px;font-size:10px;padding:4px;">
+                <!-- filled by JS -->
+              </div>
+              <input type="hidden" id="pValsts">
+            </td>
+          </tr>
+          <tr>
+            <td class="rl" style="padding:2px 5px;">Nodarbinātības statuss</td>
+            <td colspan="3" style="padding:2px 5px;">
+              <select class="ws" id="pDarbsVeids" style="width:340px;">
+                <option value="">— Izvēlieties —</option>
+                <option>Darba ņēmēja statusā</option>
+                <option>Ierēdņa statusā</option>
+                <option>Pašnodarbinātā statusā</option>
+                <option>Darba ņēmēja un pašnodarbinātā statusā</option>
+                <option>Nodarbināts lidojuma apkalpes un salona apkalpes loceklis</option>
+                <option>Nodarbināts uz Jūras kuģa</option>
+                <option>Eiropas kopienu līgumdarbinieks</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="rl" style="padding:2px 5px;">Periods no</td>
+            <td style="padding:2px 5px;"><input class="wi ro" id="pPeriodsNo" style="width:120px;" readonly></td>
+            <td class="rl" style="padding:2px 5px;">Periods līdz</td>
+            <td style="padding:2px 5px;"><input class="wi ro" id="pPeriodsLidz" style="width:120px;" readonly></td>
+          </tr>
+          <tr>
+            <td class="rl" style="padding:2px 5px;">Darba devējs</td>
+            <td style="padding:2px 5px;"><input class="wi ro" id="pDarbaDev" style="width:100%;" readonly></td>
+            <td class="rl" style="padding:2px 5px;">Apstrādā inspektors</td>
+            <td style="padding:2px 5px;">
+              <select class="ws" id="pInspector" style="width:100%;" onchange="assignInspector()">
+                <option value="">— Nav piešķirts —</option>
+              </select>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+
+      <!-- PERSON RESPONSES -->
+      <fieldset class="g">
+        <legend>Sagatavotās atbildes</legend>
+        <table class="wt"><thead><tr>
+          <th style="width:18px;"></th>
+          <th style="width:130px;">Sagatavošanas datums</th>
+          <th style="width:140px;">Reģistrācijas numurs</th>
+          <th>Atbildes dokumenta veids</th>
+          <th style="width:120px;">Nosūtīšanas veids</th>
+          <th style="width:110px;">Nosūtīšanas datums</th>
+        </tr></thead><tbody id="pRespTbody"></tbody></table>
+        <div style="display:flex;gap:4px;margin-top:4px;">
+          <button class="btn" onclick="viewSelectedResp('p')">Apskatīt atbildi</button>
+          <button class="btn" onclick="deleteDocument()">Anulēt</button>
         </div>
-        <div class="g4">
-          <span class="rl">Dzimšanas datums</span><input class="wi ro" id="pDzimDat" style="width:120px;" readonly>
-          <span class="rl"></span><span></span>
-        </div>
-        <div class="g4">
-          <span class="rl">Darba valsts</span><input class="wi ro" id="pValsts" style="width:100%;" readonly>
-          <span class="rl">Darba veids</span><input class="wi ro" id="pDarbsVeids" readonly>
-        </div>
-        <div class="g4">
-          <span class="rl">Periods no</span><input class="wi ro" id="pPeriodsNo" style="width:120px;" readonly>
-          <span class="rl">Periods līdz</span><input class="wi ro" id="pPeriodsLidz" style="width:120px;" readonly>
-        </div>
-        <div class="g4">
-          <span class="rl">Darba devējs</span><input class="wi ro" id="pDarbaDev" style="width:100%;" readonly>
-          <span class="rl">Apstrādā inspektors</span>
-          <select class="ws" id="pInspector" style="width:100%;" onchange="assignInspector()">
-            <option value="">— Nav piešķirts —</option>
-          </select>
+      </fieldset>
+
+      <!-- PERSON DECISION INFO -->
+      <fieldset class="g" id="pDecisionInfoBlock">
+        <legend>Informācija par sagatavoto atbildi</legend>
+        <div id="pDecisionInfo" style="padding:4px 0;">
+          <div style="color:#999;font-style:italic;font-size:11px;">Nav pieņemta lēmuma.</div>
         </div>
       </fieldset>
 
@@ -463,9 +531,11 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
               <input class="wi" id="approveDateTo">
             </div>
             <div class="g2" style="margin-top:4px;"><span class="rl">Piezīmes</span><input class="wi" placeholder="Neobligāts komentārs..."></div>
-            <div style="margin-top:6px;padding-top:5px;border-top:1px solid #ccc;">
-              <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" checked> Nosūtīt A1 sertifikātu iesniedzējam elektroniski</label>
-              <label class="fl" style="gap:5px;cursor:pointer;margin-top:3px;"><input type="checkbox"> Ģenerēt apliecinājuma dokumentu (.pdf)</label>
+            <div class="g2" style="margin-top:4px;">
+              <span class="rl">Nosūtāmais dokuments</span>
+              <select class="ws" style="width:100%;">
+                <option value="64501">64501 — A1 nosūtāmais</option>
+              </select>
             </div>
           </div>
         </div>
@@ -480,15 +550,27 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
               <option value="24men" data-law="EK Regula Nr. 883/2004, 12. panta 1. punkts">Periods pārsniedz 24 mēnešus</option>
               <option value="bez_dokum" data-law="EK Regula Nr. 987/2009, 19. pants">Trūkst obligāto dokumentu</option>
               <option value="neatbilst" data-law="EK Regula Nr. 883/2004 — Vispārīgie nosacījumi">Neatbilstība EK Regulas 883/2004 nosacījumiem</option>
-              <option value="cits" data-law="VSAA likums, 23. pants">Cits iemesls</option>
+              <option value="atvalinajums" data-law="EK Regula Nr. 883/2004, 11. pants">Atrodas atvaļinājumā bez darba algas saglabāšanas</option>
+              <option value="nav_atl" data-law="Imigrācijas likums, 23. pants">Ārvalstnieks, kuram nav derīgas uzturēšanās atļaujas ar tiesībām uz nodarbinātību Latvijā</option>
+              <option value="cits" data-law="">Cits iemesls</option>
             </select>
           </div>
           <div class="g2" style="margin-top:4px;"><span class="rl">Tiesiskais pamatojums</span><input class="wi" id="declineLawInput" style="width:100%;" placeholder="Tiek aizpildīts automātiski..."></div>
-          <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Papildu komentārs</span><textarea class="wta" rows="3" style="width:100%;" placeholder="Detalizēts noraidījuma pamatojums..."></textarea></div>
-          <div style="padding-top:5px;border-top:1px solid #cc8888;margin-top:4px;">
-            <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" checked> Nosūtīt automātisku e-pasta paziņojumu iesniedzējam</label>
-            <label class="fl" style="gap:5px;cursor:pointer;margin-top:3px;"><input type="checkbox"> Ģenerēt lēmuma dokumentu (.docx)</label>
-            <label class="fl" style="gap:5px;cursor:pointer;margin-top:3px;"><input type="checkbox"> Reģistrēt sūdzības iesniegšanas termiņu (30 dienas)</label>
+          <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Pamatojums brīvā tekstā</span><textarea class="wta" id="declineComment" rows="3" style="width:100%;" placeholder="Detalizēts noraidījuma pamatojums..."></textarea></div>
+          <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Komentārs</span>
+            <textarea class="wta" id="declineKomentars" rows="3" style="width:100%;">Šo lēmumu saskaņā ar Administratīvā procesa likuma 77. panta pirmo daļu un 79. panta pirmo daļu ir tiesības apstrīdēt viena mēneša laikā no lēmuma spēkā stāšanās dienas, iesniedzot Valsts sociālās apdrošināšanas aģentūras direktoram adresētu iesniegumu.</textarea>
+          </div>
+          <div style="margin-top:6px;padding-top:5px;border-top:1px solid #c0bdb5;">
+            <div style="font-weight:bold;font-size:11px;margin-bottom:4px;">Pārsūdzēšanas sadaļa</div>
+            <div class="g2" style="margin-top:2px;"><span class="rl" style="padding-top:3px;">Pamatojums brīvā tekstā</span><textarea class="wta" rows="2" style="width:100%;" placeholder="Pārsūdzēšanas pamatojums..."></textarea></div>
+            <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Tiesiskais pamatojums</span><textarea class="wta" rows="2" style="width:100%;" placeholder="Pārsūdzēšanas tiesiskais pamatojums..."></textarea></div>
+          </div>
+          <div class="g2" style="margin-top:4px;">
+            <span class="rl">Nosūtāmais dokuments</span>
+            <select class="ws" style="width:100%;">
+              <option value="2406">2406 — Lēmums par atteikumu izsniegt A1 sertifikātu</option>
+              <option value="22410">22410 — Lēmums par atteikumu izsniegt A1 sertifikātu (vairākiem darba ņēmējiem)</option>
+            </select>
           </div>
         </div>
         <div class="ds" id="pendingSection">
@@ -509,32 +591,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
         </div>
       </fieldset>
 
-      <!-- PERSON RESPONSES -->
-      <fieldset class="g">
-        <legend>Sagatavotās atbildes</legend>
-        <table class="wt"><thead><tr>
-          <th style="width:18px;"></th>
-          <th style="width:130px;">Sagatavošanas datums</th>
-          <th style="width:140px;">Reģistrācijas numurs</th>
-          <th>Atbildes dokumenta veids</th>
-          <th style="width:120px;">Nosūtīšanas veids</th>
-          <th style="width:110px;">Nosūtīšanas datums</th>
-        </tr></thead><tbody id="pRespTbody"></tbody></table>
-        <div style="display:flex;gap:4px;margin-top:4px;">
-          <button class="btn" onclick="viewSelectedResp('p')">Apskatīt atbildi</button>
-          <button class="btn" onclick="deleteDocument()">Anulēt</button>
-          <button class="btn" style="margin-left:auto;" onclick="generateDoc()">Ģenerēt dokumentu</button>
-        </div>
-      </fieldset>
-
-      <!-- PERSON DECISION INFO -->
-      <fieldset class="g" id="pDecisionInfoBlock">
-        <legend>Informācija par sagatavoto atbildi</legend>
-        <div id="pDecisionInfo" style="padding:4px 0;">
-          <div style="color:#999;font-style:italic;font-size:11px;">Nav pieņemta lēmuma.</div>
-        </div>
-      </fieldset>
-
+>
     </div>
   </div>
 </div>
@@ -655,36 +712,39 @@ var INSP_DB=[
 var apps=[
   {id:'A001',nr:'11724',date:'13.04.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz DE, LT, PL',appRegNr:'2026-A1-11724',appRegDate:'13.04.2026',receiveType:'E-iesniegums (portāls)',
+   appName:'Iesniegums sociāli apdrošināmās personas statusa saglabāšanai Latvijā',appRegNr:'2026-A1-11724',appRegDate:'13.04.2026',receiveType:'E-iesniegums (portāls)',
    status:'proc',expanded:false,selectedInspectors:['ĀBOLTIŅA I.','KALNIŅA J.'],
    persons:[
-     {name:'STEINBRUCK RALF MICHAEL',kods:'111111-11111',valsts:'Vācija (DE)',veids:'Norīkotais darbinieks',no:'01.05.2026',lidz:'31.10.2026',devejs:'Kreiss GmbH, Berlīne',iesniegts:'13.04.2026',status:'proc',inspector:'ĀBOLTIŅA I.'},
-     {name:'ZUOZU SIGITAS',kods:'311111-11112',valsts:'Lietuva (LT)',veids:'Norīkotais darbinieks',no:'15.05.2026',lidz:'15.11.2026',devejs:'UAB Kreiss, Viļņa',iesniegts:'13.04.2026',status:'proc',inspector:'KALNIŅA J.'},
+     {name:'MIKE WAZOWSKI',kods:'291011-12345',valsts:'Vācija (DE)',veids:'Norīkotais darbinieks',no:'01.05.2026',lidz:'31.10.2026',devejs:'Kreiss GmbH, Berlīne',iesniegts:'13.04.2026',status:'proc',inspector:'ĀBOLTIŅA I.'},
+     {name:'BUZZ LIGHTYEAR',kods:'311111-11112',valsts:'Lietuva (LT)',veids:'Norīkotais darbinieks',no:'15.05.2026',lidz:'15.11.2026',devejs:'UAB Kreiss, Viļņa',iesniegts:'13.04.2026',status:'proc',inspector:'KALNIŅA J.'},
      {name:'BĒRZIŅŠ JĀNIS',kods:'311111-11113',valsts:'Polija (PL)',veids:'Sezonālais darbs',no:'01.06.2026',lidz:'31.08.2026',devejs:'Kreiss Sp.z.o.o., Varšava',iesniegts:'13.04.2026',status:'new',inspector:''}
    ],
    docs:[
      {name:'darba_ligums_ralf.pdf',size:'245 KB',descr:'Darba līguma kopija',date:'13.04.2026'},
      {name:'norikojums_DE_ralf.pdf',size:'118 KB',descr:'Norīkojuma vēstule uz Vāciju',date:'13.04.2026'}
-   ],responses:[]
+   ],responses:[{prepDate:'14.04.2026 10:22',regNr:'ATB-2026-11724-01',docType:'A1 sertifikāts (64501)',sendType:'E-pasts',sendDate:'14.04.2026',persons:['291011-12345']}]
   },
-  {id:'A002',nr:'11725',date:'12.03.2026',company:'SIA KREISS',
-   regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz EE',appRegNr:'2026-A1-11725',appRegDate:'12.03.2026',receiveType:'E-iesniegums (portāls)',
-   status:'new',expanded:false,selectedInspectors:[],
+  {id:'A002',nr:'11725',date:'12.03.2026',company:'PETROV ALEKSANDR',
+   regNr:'211111-21111',adrese:'Dzirnavu iela 12-5, Rīga, LV-1010',talrunis:'+371 29123456',kontakts:'—',epasts:'a.petrov@inbox.lv',
+   appName:'Iesniegums sociāli apdrošināmās personas statusa saglabāšanai Latvijā',appRegNr:'2026-A1-11725',appRegDate:'12.03.2026',receiveType:'E-iesniegums (portāls)',
+   status:'new',expanded:false,selectedInspectors:[],submitter:'person',kontakts:'—',epasts:'—',
    persons:[{name:'PETROV ALEKSANDR',kods:'211111-21111',valsts:'Igaunija (EE)',veids:'Norīkotais darbinieks',no:'01.04.2026',lidz:'30.09.2026',devejs:'AS Kreiss Eesti, Tallina',iesniegts:'12.03.2026',status:'new',inspector:''}],
    docs:[{name:'petrov_darba_lig.pdf',size:'189 KB',descr:'Darba līgums',date:'12.03.2026'}],responses:[]
   },
   {id:'A003',nr:'11726',date:'10.03.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz SE',appRegNr:'2026-A1-11726',appRegDate:'10.03.2026',receiveType:'Klātienē',
+   appName:'Iesniegums sociāli apdrošināmās personas statusa saglabāšanai Latvijā',appRegNr:'2026-A1-11726',appRegDate:'10.03.2026',receiveType:'Klātienē',
    status:'ok',expanded:false,selectedInspectors:['ĀBOLTIŅA I.'],
-   persons:[{name:'KALNIŅŠ ANDRIS',kods:'411111-41111',valsts:'Zviedrija (SE)',veids:'Norīkotais darbinieks',no:'01.04.2026',lidz:'30.09.2026',devejs:'Kreiss Sverige AB, Stokholma',iesniegts:'10.03.2026',status:'ok',inspector:'ĀBOLTIŅA I.'}],
+   persons:[{name:'KALNIŅŠ ANDRIS',kods:'411111-41111',valsts:'Zviedrija (SE)',veids:'Norīkotais darbinieks',no:'01.04.2026',lidz:'30.09.2026',devejs:'Kreiss Sverige AB, Stokholma',iesniegts:'10.03.2026',status:'ok',inspector:'ĀBOLTIŅA I.',approvedFrom:'01.04.2026',approvedTo:'30.09.2026',
+     a1Periods:[
+       {from:'01.04.2026',to:'30.09.2026',countries:['Zviedrija'],breakPeriods:[{from:'15.06.2026',to:'30.06.2026'}]}
+     ]}],
    docs:[{name:'a1_kalnins_SE.pdf',size:'98 KB',descr:'Izsniegts A1 sertifikāts',date:'15.03.2026'}],
    responses:[{prepDate:'15.03.2026 09:05',regNr:'ATB-2026-11726-01',docType:'A1 sertifikāts',sendType:'E-pasts',sendDate:'15.03.2026',persons:['411111-41111']}]
   },
   {id:'A004',nr:'11720',date:'01.02.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz AT',appRegNr:'2026-A1-11720',appRegDate:'01.02.2026',receiveType:'Pa pastu',
+   appName:'Iesniegums sociāli apdrošināmās personas statusa saglabāšanai Latvijā',appRegNr:'2026-A1-11720',appRegDate:'01.02.2026',receiveType:'Pa pastu',
    status:'no',expanded:false,selectedInspectors:['STRAUTIŅŠ P.'],
    persons:[{name:'MÜLLER HANS',kods:'511111-51111',valsts:'Austrija (AT)',veids:'Norīkotais darbinieks',no:'01.01.2026',lidz:'31.01.2026',devejs:'Kreiss GmbH Wien, Vīne',iesniegts:'01.02.2026',status:'no',inspector:'STRAUTIŅŠ P.'}],
    docs:[{name:'muller_norikojums.pdf',size:'205 KB',descr:'Norīkojuma vēstule',date:'01.02.2026'}],
@@ -692,7 +752,7 @@ var apps=[
   },
   {id:'A005',nr:'11701',date:'15.01.2026',company:'SIA KREISS',
    regNr:'40003123456',adrese:'Brīvības iela 40, Rīga, LV-1010',talrunis:'+371 67123456',kontakts:'Jānis Bērziņš',epasts:'j.berzins@kreiss.lv',
-   appName:'Pieteikums A1 sertifikāta saņemšanai — norīkojums uz NL',appRegNr:'2026-A1-11701',appRegDate:'15.01.2026',receiveType:'E-iesniegums (portāls)',
+   appName:'Iesniegums sociāli apdrošināmās personas statusa saglabāšanai Latvijā',appRegNr:'2026-A1-11701',appRegDate:'15.01.2026',receiveType:'E-iesniegums (portāls)',
    status:'proc',expanded:false,selectedInspectors:['OZOLIŅA S.'],
    persons:[{name:'KOWALSKI PIOTR',kods:'611111-61111',valsts:'Nīderlande (NL)',veids:'Norīkotais darbinieks',no:'01.02.2026',lidz:'31.07.2026',devejs:'Kreiss BV, Amsterdama',iesniegts:'15.01.2026',status:'proc',inspector:'OZOLIŅA S.'}],
    docs:[{name:'kowalski_ligums.pdf',size:'312 KB',descr:'Darba līgums',date:'15.01.2026'},{name:'kreiss_bv_reg.pdf',size:'88 KB',descr:'Darba devēja reģistrācija NL',date:'15.01.2026'}],
@@ -762,6 +822,14 @@ function onSelectApp(app){
   renderList();showView('company');
   sv('cNosaukums',app.company);sv('cRegNr',app.regNr);sv('cAdrese',app.adrese);
   sv('cTalrunis',app.talrunis);sv('cKontakts',app.kontakts);sv('cEpasts',app.epasts);
+  // Adapt labels based on submitter type
+  var isPerson=app.submitter==='person';
+  document.getElementById('lblNosaukums').textContent=isPerson?'Uzvārds Vārds':'Nosaukums';
+  document.getElementById('lblRegNr').textContent=isPerson?'Personas kods':'Reģ. numurs';
+  document.getElementById('lblAdrese').textContent=isPerson?'Deklarētā adrese':'Juridiskā adrese';
+  document.getElementById('cKontaktsRow').style.display=isPerson?'none':'';
+  document.getElementById('cEpastsOnlyRow').style.display=isPerson?'':'none';
+  sv('cEpastsOnly',app.epasts);
   sv('cAppName',app.appName);sv('cAppRegNr',app.appRegNr);
   sv('cAppFullTitle',app.appRegNr+'  —  '+app.appName);
   sv('cAppRegDate',app.appRegDate);sv('cAppReceiveType',app.receiveType);
@@ -786,8 +854,12 @@ function onSelectApp(app){
 function onSelectPerson(app,p){
   selApp=app;selPerson=p;viewMode='person';
   renderList();showView('person');
-  sv('pPersona',p.name);sv('pPersKods',p.kods);sv('pValsts',p.valsts);sv('pDarbsVeids',p.veids);
-  sv('pPeriodsNo',p.no);sv('pPeriodsLidz',p.lidz);sv('pDarbaDev',p.devejs);
+  sv('pPersona',p.name);sv('pPersKods',p.kods);sv('pPeriodsNo',p.no);sv('pPeriodsLidz',p.lidz);sv('pDarbaDev',p.devejs);
+  // Nodarbinātības statuss dropdown
+  var dd=document.getElementById('pDarbsVeids');
+  if(dd){dd.value=p.veids||'';if(!dd.value)dd.selectedIndex=0;}
+  // Darba valstis list
+  renderPersonCountries(p);
   // Dzimšanas datums from personas kods (LV format: DDMMYY-XXXXX)
   var dzim='—';
   if(p.kods&&p.kods.length>=6){
@@ -1449,7 +1521,7 @@ function registerNewApp(){
   var nr=''+(11800+apps.length);
   var a={id:'A'+Date.now(),nr:nr,date:dt,company:co,regNr:rn,adrese:'—',talrunis:'—',
     kontakts:document.getElementById('naCt').value||'—',epasts:document.getElementById('naEm').value||'—',
-    appName:'Pieteikums A1 sertifikāta saņemšanai',appRegNr:now.getFullYear()+'-A1-'+nr,
+    appName:'Iesniegums sociāli apdrošināmās personas statusa saglabāšanai Latvijā',appRegNr:now.getFullYear()+'-A1-'+nr,
     appRegDate:dt,receiveType:document.getElementById('naRt').value,
     status:'new',expanded:false,inspectorCount:parseInt(document.getElementById('naIc').value)||1,
     persons:[],docs:[],responses:[]};
@@ -1481,6 +1553,47 @@ function postponeApp(){if(viewMode!=='person'){showInfo('Kļūda','Izvēlieties 
 function viewDocument(){if(!selApp)return;showInfo('Dokumenta apskate','Dokuments tiek atvērts skatīšanai...');}
 function deleteDocument(){if(!selApp)return;if(confirm('Dzēst izvēlēto dokumentu?'))showNotif('Dzēsts','Dokuments dzēsts.');}
 function generateDoc(){if(!selApp)return;showNotif('Ģenerēts','Dokuments sagatavots un pievienots atbilžu sarakstam.');}
+
+var EU_COUNTRIES=[
+  'Austrija','Beļģija','Bulgārija','Čehija','Dānija','Francija',
+  'Grieķija','Horvātija','Igaunija','Itālija','Īrija','Islande',
+  'Kipra','Latvija','Apvienotā Karaliste','Lietuva','Lihtenšteina','Luksemburga',
+  'Malta','Nīderlande','Norvēģija','Polija','Portugāle','Rumānija',
+  'Slovākija','Slovēnija','Somija','Spānija','Šveice','Ungārija',
+  'Vācija','Zviedrija'
+];
+
+function renderPersonCountries(p){
+  var box=document.getElementById('pValstsList');
+  if(!box)return;
+  if(!p.valstis)p.valstis=p.valsts?[p.valsts]:[];
+  box.innerHTML='';
+  EU_COUNTRIES.forEach(function(c){
+    var checked=p.valstis.indexOf(c)!==-1;
+    var lbl=document.createElement('label');
+    lbl.style.cssText='display:flex;align-items:center;gap:3px;cursor:pointer;white-space:nowrap;padding:1px 0;';
+    var chk=document.createElement('input');
+    chk.type='checkbox';chk.style.margin='0';chk.checked=checked;
+    chk.addEventListener('change',function(){
+      if(!selPerson)return;
+      if(!selPerson.valstis)selPerson.valstis=[];
+      if(this.checked){
+        if(selPerson.valstis.indexOf(c)===-1)selPerson.valstis.push(c);
+      } else {
+        selPerson.valstis=selPerson.valstis.filter(function(v){return v!==c;});
+      }
+    });
+    var sp=document.createElement('span');sp.textContent=c;
+    lbl.appendChild(chk);lbl.appendChild(sp);
+    box.appendChild(lbl);
+  });
+}
+
+function addPersonCountry(){
+  if(!selPerson)return;
+  if(!selPerson.valstis)selPerson.valstis=[];
+  renderPersonCountries(selPerson);
+}
 
 function addA1Period(){
   if(!selPerson)return;
@@ -1518,4 +1631,4 @@ setInterval(updateClock,1000);updateClock();
 showView('empty');renderList();
 </script>
 </body>
-</html>
+</html
