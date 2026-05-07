@@ -287,9 +287,9 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
       <!-- TABS -->
       <div id="cTabsBlock">
         <div style="display:flex;align-items:flex-end;gap:0;margin-bottom:0;padding-left:2px;">
-          <div class="ctab active" id="ctab_docs"    onclick="switchCTab('docs')">Iesniegumam pievienotie dokumenti</div>
+          <div class="ctab active" id="ctab_docs"    onclick="switchCTab('docs')">Pievienotie dokumenti</div>
           <div class="ctab"        id="ctab_devejs"  onclick="switchCTab('devejs')">Darba devēja raksturojums</div>
-          <div class="ctab"        id="ctab_atteikt" onclick="switchCTab('atteikt')">Sagatavot atteikumu</div>
+          <div class="ctab"        id="ctab_atteikt" onclick="switchCTab('atteikt')">Atlikt / Atteikt iesniegumu</div>
           <div class="ctab"        id="ctab_resp"    onclick="switchCTab('resp')">Sagatavotās atbildes</div>
           <div class="ctab"        id="ctab_insp"    onclick="switchCTab('insp')">Inspektori</div>
           <div class="ctab"        id="ctab_gaita"   onclick="switchCTab('gaita')">Iesnieguma apstrādes gaita</div>
@@ -338,10 +338,10 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <!-- TAB: Atteikt -->
           <div class="ctab-panel" id="cpanel_atteikt">
             <div style="padding:4px 0 8px;display:flex;align-items:center;gap:18px;">
-              <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="atteiktType" value="atteikt" checked onchange="switchAtteiktType('atteikt')"><span style="color:#880000;font-weight:bold;">Atteikt iesniegumu</span></label>
-              <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="atteiktType" value="atlikt" onchange="switchAtteiktType('atlikt')"><span style="color:#884400;font-weight:bold;">⏸ Atlikt apstrādi</span></label>
+              <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="atteiktType" value="atlikt" checked onchange="switchAtteiktType('atlikt')"><span style="color:#884400;font-weight:bold;">⏸ Atlikt apstrādi</span></label>
+              <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="atteiktType" value="atteikt" onchange="switchAtteiktType('atteikt')"><span style="color:#880000;font-weight:bold;">Atteikt iesniegumu</span></label>
             </div>
-            <div id="atteiktSection" class="atts show">
+            <div id="atteiktSection" class="atts">
               <div class="g2" style="margin-top:0;">
                 <span class="rl" style="color:#880000;font-weight:bold;">Atteikuma iemesls</span>
                 <select class="ws" id="atteiktReason" style="width:100%;" onchange="fillTiesiskais()">
@@ -365,7 +365,7 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
                 <textarea class="wta" rows="2" style="width:100%;" placeholder="Pamatojums brīvā tekstā..."></textarea>
               </div>
             </div>
-            <div id="atliktSection" class="atts">
+            <div id="atliktSection" class="atts show">
               <div class="g2" style="margin-top:0;">
                 <span class="rl" style="color:#884400;font-weight:bold;">Pieprasītā info</span>
                 <select class="ws" style="width:100%;">
@@ -545,111 +545,162 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
         </table>
       </fieldset>
 
-      <fieldset class="g">
-        <legend>Sagatavotās atbildes</legend>
-        <table class="wt"><thead><tr>
-          <th style="width:18px;"></th>
-          <th style="width:130px;">Sagatavošanas datums</th>
-          <th style="width:140px;">Reģistrācijas numurs</th>
-          <th>Atbildes dokumenta veids</th>
-          <th style="width:120px;">Nosūtīšanas veids</th>
-          <th style="width:110px;">Nosūtīšanas datums</th>
-          <th style="width:90px;">Periods no</th>
-          <th style="width:90px;">Periods līdz</th>
-        </tr></thead><tbody id="pRespTbody"></tbody></table>
-        <div style="display:flex;gap:4px;margin-top:4px;">
-          <button class="btn" onclick="viewSelectedResp('p')">Apskatīt atbildi</button>
-          <button class="btn" onclick="deleteDocument()">Anulēt</button>
+      <!-- PERSON TABS -->
+      <div id="pTabsBlock">
+        <div style="display:flex;align-items:flex-end;gap:0;margin-bottom:0;padding-left:2px;">
+          <div class="ctab active" id="ptab_raksturojums" onclick="switchPTab('raksturojums')">Darba ņēmēja raksturojums</div>
+          <div class="ctab"        id="ptab_lemums"       onclick="switchPTab('lemums')">&#9654; Lēmums</div>
+          <div class="ctab"        id="ptab_atbildes"     onclick="switchPTab('atbildes')">Sagatavotās atbildes</div>
         </div>
-      </fieldset>
+        <div class="ctab-body">
 
-      <fieldset class="g" id="pDecisionInfoBlock">
-        <legend>Pārtraukuma periodi</legend>
-        <table style="width:100%;border-collapse:collapse;font-size:11px;border:2px solid;border-color:#808080 #fff #fff #808080;">
-          <thead>
-            <tr style="background:#d4d0c8;border-bottom:1px solid #808080;">
-              <th style="padding:2px 8px;font-weight:normal;text-align:left;width:115px;">Datums</th>
-              <th style="padding:2px 8px;font-weight:normal;text-align:left;width:180px;">Pamatojums</th>
-              <th style="padding:2px 8px;font-weight:normal;text-align:left;">Dok. Nr.</th>
-            </tr>
-          </thead>
-          <tbody id="pBreakPeriodsTbody"></tbody>
-        </table>
-        <div style="display:flex;gap:4px;margin-top:4px;">
-          <button class="btn sm" onclick="viewDocument()">Apskatīt dokumentu</button>
-          <button class="btn sm" style="color:#880000;" onclick="deleteSelectedBreakPeriod()">Dzēst pārtraukuma periodu</button>
-        </div>
-      </fieldset>
+          <!-- TAB: Darba ņēmēja raksturojums -->
+          <div class="ctab-panel active" id="ppanel_raksturojums">
 
-      <fieldset class="g">
-        <legend>&#9654; Lēmums</legend>
-        <div class="rg">
-          <label class="ro2"><input type="radio" name="decision" value="approve" checked onchange="handleDecision('approve')"><span class="lok">✔ Apstiprināt</span></label>
-          <label class="ro2"><input type="radio" name="decision" value="decline" onchange="handleDecision('decline')"><span class="lno">✘ Noraidīt</span></label>
-          <label class="ro2"><input type="radio" name="decision" value="pending" onchange="handleDecision('pending')"><span class="lwt">⏸ Atlikt (papildu info)</span></label>
-          <div style="flex:1;text-align:right;"><span id="currentStatus" class="badge bp">Apstrādē</span></div>
-        </div>
-        <div id="approveSection">
-          <div class="dp2">
-            <div style="display:grid;grid-template-columns:120px 120px 50px 120px;gap:6px;align-items:center;">
-              <span class="rl" style="color:#004400;font-weight:bold;">Apstiprināt no</span>
-              <input class="wi" id="approveDateFrom">
-              <span style="text-align:center;color:#004400;font-weight:bold;">līdz</span>
-              <input class="wi" id="approveDateTo">
+            <div style="font-weight:bold;font-size:11px;margin:2px 0 3px;color:#0a246a;">Nodarbinātības periodi pie Darba devēja</div>
+            <table class="wt" style="margin-bottom:6px;">
+              <thead><tr>
+                <th style="width:100px;">Periods no</th>
+                <th style="width:100px;">Periods līdz</th>
+                <th>Amats / Piezīme</th>
+                <th style="width:90px;">Valsts</th>
+              </tr></thead>
+              <tbody id="pNodarbTbody">
+                <tr><td>01.01.2024</td><td>31.12.2024</td><td>Šoferis</td><td>Latvija</td></tr>
+                <tr><td>01.01.2025</td><td>31.05.2026</td><td>Šoferis</td><td>Latvija</td></tr>
+              </tbody>
+            </table>
+
+            <hr class="sep">
+
+            <div style="font-weight:bold;font-size:11px;margin:5px 0 3px;color:#0a246a;">Iepriekš sagatavotās atbildes par A1 sertifikāta pieprasījumiem</div>
+            <table class="wt">
+              <thead><tr>
+                <th style="width:120px;">Sagatavošanas datums</th>
+                <th style="width:90px;">Dokumenta kods</th>
+                <th>Nosaukums</th>
+              </tr></thead>
+              <tbody id="pPrevA1Tbody">
+                <tr><td>15.03.2026</td><td>64501</td><td>A1 sertifikāts — Zviedrija (SE) 01.04.2026–30.09.2026</td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:4px;">
+              <button class="btn sm" onclick="viewDocument()">Apskatīt dokumentu</button>
             </div>
-            <div class="g2" style="margin-top:4px;"><span class="rl">Piezīmes</span><input class="wi" placeholder="Neobligāts komentārs..."></div>
-            <div class="g2" style="margin-top:4px;">
-              <span class="rl">Nosūtāmais dokuments</span>
-              <select class="ws" style="width:100%;"><option value="64501">64501 — A1 nosūtāmais</option></select>
+
+          </div>
+
+          <!-- TAB: Lēmums -->
+          <div class="ctab-panel" id="ppanel_lemums">
+            <div class="rg">
+              <label class="ro2"><input type="radio" name="decision" value="pending" onchange="handleDecision('pending')"><span class="lwt">⏸ Atlikt (papildu info)</span></label>
+              <label class="ro2"><input type="radio" name="decision" value="approve" onchange="handleDecision('approve')"><span class="lok">✔ Apstiprināt</span></label>
+              <label class="ro2"><input type="radio" name="decision" value="decline" onchange="handleDecision('decline')"><span class="lno">✘ Noraidīt</span></label>
+              <div style="flex:1;text-align:right;"><span id="currentStatus" class="badge bp">Apstrādē</span></div>
+            </div>
+            <div id="approveSection">
+              <div class="dp2">
+                <div style="display:grid;grid-template-columns:120px 120px 50px 120px;gap:6px;align-items:center;">
+                  <span class="rl" style="color:#004400;font-weight:bold;">Apstiprināt no</span>
+                  <input class="wi" id="approveDateFrom">
+                  <span style="text-align:center;color:#004400;font-weight:bold;">līdz</span>
+                  <input class="wi" id="approveDateTo">
+                </div>
+                <div class="g2" style="margin-top:4px;"><span class="rl">Piezīmes</span><input class="wi" placeholder="Neobligāts komentārs..."></div>
+                <div class="g2" style="margin-top:4px;">
+                  <span class="rl">Nosūtāmais dokuments</span>
+                  <select class="ws" style="width:100%;"><option value="64501">64501 — A1 nosūtāmais</option></select>
+                </div>
+              </div>
+            </div>
+            <div class="ds" id="declineSection">
+              <div class="g2" style="margin-top:0;"><span class="rl" style="color:#880000;font-weight:bold;">Noraidījuma iemesls</span>
+                <select class="ws" id="declineReason" style="width:100%;" onchange="fillDeclineLaw()">
+                  <option value="">— Izvēlieties iemeslu —</option>
+                  <option value="nav_apdros" data-law="EK Regula Nr. 883/2004, 12. pants — Norīkotie darbinieki">Persona nav sociāli apdrošināta Latvijā norīkojuma laikā</option>
+                  <option value="pagajuse"   data-law="Administratīvā procesa likums, 66. pants">Iesniegums iesniegts par jau pagājušu periodu</option>
+                  <option value="nav_reg"    data-law="Sociālās apdrošināšanas likums, 7. pants">Darba devējs nav reģistrēts kā darba devējs</option>
+                  <option value="vienlaicigi" data-law="EK Regula Nr. 883/2004, 13. pants">Persona vienlaicīgi strādā mērķa dalībvalstī</option>
+                  <option value="24men"      data-law="EK Regula Nr. 883/2004, 12. panta 1. punkts">Periods pārsniedz 24 mēnešus</option>
+                  <option value="bez_dokum"  data-law="EK Regula Nr. 987/2009, 19. pants">Trūkst obligāto dokumentu</option>
+                  <option value="neatbilst"  data-law="EK Regula Nr. 883/2004 — Vispārīgie nosacījumi">Neatbilstība EK Regulas 883/2004 nosacījumiem</option>
+                  <option value="atvalinajums" data-law="EK Regula Nr. 883/2004, 11. pants">Atrodas atvaļinājumā bez darba algas saglabāšanas</option>
+                  <option value="nav_atl"    data-law="Imigrācijas likums, 23. pants">Ārvalstnieks, kuram nav derīgas uzturēšanās atļaujas</option>
+                  <option value="cits"       data-law="">Cits iemesls</option>
+                </select>
+              </div>
+              <div class="g2" style="margin-top:4px;"><span class="rl">Tiesiskais pamatojums</span><input class="wi" id="declineLawInput" style="width:100%;" placeholder="Tiek aizpildīts automātiski..."></div>
+              <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Pamatojums brīvā tekstā</span><textarea class="wta" id="declineComment" rows="3" style="width:100%;" placeholder="Detalizēts noraidījuma pamatojums..."></textarea></div>
+              <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Komentārs</span>
+                <textarea class="wta" id="declineKomentars" rows="3" style="width:100%;">Šo lēmumu saskaņā ar Administratīvā procesa likuma 77. panta pirmo daļu un 79. panta pirmo daļu ir tiesības apstrīdēt viena mēneša laikā no lēmuma spēkā stāšanās dienas, iesniedzot Valsts sociālās apdrošināšanas aģentūras direktoram adresētu iesniegumu.</textarea>
+              </div>
+              <div class="g2" style="margin-top:4px;">
+                <span class="rl">Nosūtāmais dokuments</span>
+                <select class="ws" style="width:100%;">
+                  <option value="2406">2406 — Lēmums par atteikumu izsniegt A1 sertifikātu</option>
+                  <option value="22410">22410 — Lēmums par atteikumu izsniegt A1 sertifikātu (vairākiem darba ņēmējiem)</option>
+                </select>
+              </div>
+            </div>
+            <div class="ds" id="pendingSection">
+              <div class="g2" style="margin-top:0;"><span class="rl" style="color:#884400;font-weight:bold;">Pieprasītā info</span>
+                <select class="ws" style="width:100%;">
+                  <option value="">— Izvēlieties —</option>
+                  <option>Darba līguma kopija ar darba devēju mērķa valstī</option>
+                  <option>Norīkojuma vēstules oriģināls ar parakstu</option>
+                  <option>Izziņa par sociālo apdrošināšanu iepriekšējos 2 gados</option>
+                  <option>Darba devēja reģistrācijas apliecinājums</option>
+                </select>
+              </div>
+              <div class="g2" style="margin-top:4px;"><span class="rl">Termiņš līdz</span><input class="wi" style="width:120px;" placeholder="dd.mm.gggg"></div>
+              <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Piezīmes</span><textarea class="wta" rows="2" style="width:100%;" placeholder="Papildu norādījumi iesniedzējam..."></textarea></div>
+              <div style="margin-top:5px;padding-top:4px;border-top:1px solid #ccaa66;">
+                <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" checked> Nosūtīt e-pasta pieprasījumu iesniedzējam</label>
+              </div>
             </div>
           </div>
+
+          <!-- TAB: Sagatavotās atbildes + Pārtraukuma periodi -->
+          <div class="ctab-panel" id="ppanel_atbildes">
+
+            <div style="font-weight:bold;font-size:11px;margin-bottom:3px;color:#0a246a;">Sagatavotās atbildes</div>
+            <table class="wt"><thead><tr>
+              <th style="width:18px;"></th>
+              <th style="width:130px;">Sagatavošanas datums</th>
+              <th style="width:140px;">Reģistrācijas numurs</th>
+              <th>Atbildes dokumenta veids</th>
+              <th style="width:120px;">Nosūtīšanas veids</th>
+              <th style="width:110px;">Nosūtīšanas datums</th>
+              <th style="width:90px;">Periods no</th>
+              <th style="width:90px;">Periods līdz</th>
+            </tr></thead><tbody id="pRespTbody"></tbody></table>
+            <div style="display:flex;gap:4px;margin-top:4px;">
+              <button class="btn sm" onclick="viewSelectedResp('p')">Apskatīt atbildi</button>
+              <button class="btn sm" onclick="deleteDocument()">Anulēt</button>
+            </div>
+
+            <hr class="sep" style="margin:8px 0;">
+
+            <div style="font-weight:bold;font-size:11px;margin-bottom:3px;color:#0a246a;">Pārtraukuma datums</div>
+            <table style="width:100%;border-collapse:collapse;font-size:11px;border:2px solid;border-color:#808080 #fff #fff #808080;">
+              <thead>
+                <tr style="background:#d4d0c8;border-bottom:1px solid #808080;">
+                  <th style="padding:2px 8px;font-weight:normal;text-align:left;width:115px;">Pārtraukuma datums</th>
+                  <th style="padding:2px 8px;font-weight:normal;text-align:left;width:180px;">Pamatojums</th>
+                  <th style="padding:2px 8px;font-weight:normal;text-align:left;">Dok. Nr.</th>
+                </tr>
+              </thead>
+              <tbody id="pBreakPeriodsTbody"></tbody>
+            </table>
+            <div style="display:flex;gap:4px;margin-top:4px;">
+              <button class="btn sm" onclick="viewDocument()">Apskatīt dokumentu</button>
+              <button class="btn sm" style="color:#880000;" onclick="deleteSelectedBreakPeriod()">Dzēst pārtraukuma periodu</button>
+            </div>
+
+          </div>
+
         </div>
-        <div class="ds" id="declineSection">
-          <div class="g2" style="margin-top:0;"><span class="rl" style="color:#880000;font-weight:bold;">Noraidījuma iemesls</span>
-            <select class="ws" id="declineReason" style="width:100%;" onchange="fillDeclineLaw()">
-              <option value="">— Izvēlieties iemeslu —</option>
-              <option value="nav_apdros" data-law="EK Regula Nr. 883/2004, 12. pants — Norīkotie darbinieki">Persona nav sociāli apdrošināta Latvijā norīkojuma laikā</option>
-              <option value="pagajuse"   data-law="Administratīvā procesa likums, 66. pants">Iesniegums iesniegts par jau pagājušu periodu</option>
-              <option value="nav_reg"    data-law="Sociālās apdrošināšanas likums, 7. pants">Darba devējs nav reģistrēts kā darba devējs</option>
-              <option value="vienlaicigi" data-law="EK Regula Nr. 883/2004, 13. pants">Persona vienlaicīgi strādā mērķa dalībvalstī</option>
-              <option value="24men"      data-law="EK Regula Nr. 883/2004, 12. panta 1. punkts">Periods pārsniedz 24 mēnešus</option>
-              <option value="bez_dokum"  data-law="EK Regula Nr. 987/2009, 19. pants">Trūkst obligāto dokumentu</option>
-              <option value="neatbilst"  data-law="EK Regula Nr. 883/2004 — Vispārīgie nosacījumi">Neatbilstība EK Regulas 883/2004 nosacījumiem</option>
-              <option value="atvalinajums" data-law="EK Regula Nr. 883/2004, 11. pants">Atrodas atvaļinājumā bez darba algas saglabāšanas</option>
-              <option value="nav_atl"    data-law="Imigrācijas likums, 23. pants">Ārvalstnieks, kuram nav derīgas uzturēšanās atļaujas</option>
-              <option value="cits"       data-law="">Cits iemesls</option>
-            </select>
-          </div>
-          <div class="g2" style="margin-top:4px;"><span class="rl">Tiesiskais pamatojums</span><input class="wi" id="declineLawInput" style="width:100%;" placeholder="Tiek aizpildīts automātiski..."></div>
-          <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Pamatojums brīvā tekstā</span><textarea class="wta" id="declineComment" rows="3" style="width:100%;" placeholder="Detalizēts noraidījuma pamatojums..."></textarea></div>
-          <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Komentārs</span>
-            <textarea class="wta" id="declineKomentars" rows="3" style="width:100%;">Šo lēmumu saskaņā ar Administratīvā procesa likuma 77. panta pirmo daļu un 79. panta pirmo daļu ir tiesības apstrīdēt viena mēneša laikā no lēmuma spēkā stāšanās dienas, iesniedzot Valsts sociālās apdrošināšanas aģentūras direktoram adresētu iesniegumu.</textarea>
-          </div>
-          <div class="g2" style="margin-top:4px;">
-            <span class="rl">Nosūtāmais dokuments</span>
-            <select class="ws" style="width:100%;">
-              <option value="2406">2406 — Lēmums par atteikumu izsniegt A1 sertifikātu</option>
-              <option value="22410">22410 — Lēmums par atteikumu izsniegt A1 sertifikātu (vairākiem darba ņēmējiem)</option>
-            </select>
-          </div>
-        </div>
-        <div class="ds" id="pendingSection">
-          <div class="g2" style="margin-top:0;"><span class="rl" style="color:#884400;font-weight:bold;">Pieprasītā info</span>
-            <select class="ws" style="width:100%;">
-              <option value="">— Izvēlieties —</option>
-              <option>Darba līguma kopija ar darba devēju mērķa valstī</option>
-              <option>Norīkojuma vēstules oriģināls ar parakstu</option>
-              <option>Izziņa par sociālo apdrošināšanu iepriekšējos 2 gados</option>
-              <option>Darba devēja reģistrācijas apliecinājums</option>
-            </select>
-          </div>
-          <div class="g2" style="margin-top:4px;"><span class="rl">Termiņš līdz</span><input class="wi" style="width:120px;" placeholder="dd.mm.gggg"></div>
-          <div class="g2" style="margin-top:4px;"><span class="rl" style="padding-top:3px;">Piezīmes</span><textarea class="wta" rows="2" style="width:100%;" placeholder="Papildu norādījumi iesniedzējam..."></textarea></div>
-          <div style="margin-top:5px;padding-top:4px;border-top:1px solid #ccaa66;">
-            <label class="fl" style="gap:5px;cursor:pointer;"><input type="checkbox" checked> Nosūtīt e-pasta pieprasījumu iesniedzējam</label>
-          </div>
-        </div>
-      </fieldset>
+      </div>
 
     </div><!-- personView -->
   </div><!-- wr -->
@@ -996,8 +1047,9 @@ function onSelectPerson(app,p){
   populatePersonInspDropdown();
   document.getElementById('pInspector').value=p.inspector||'';
   var b=document.getElementById('currentStatus');b.className='badge '+sBadge[p.status];b.textContent=sLbl[p.status];
-  var dv=p.status==='no'?'decline':'approve';
+  var dv=p.status==='no'?'decline':p.status==='ok'?'approve':'pending';
   document.querySelector('input[name="decision"][value="'+dv+'"]').checked=true;handleDecision(dv);
+  switchPTab('raksturojums');
   var pResp=app.responses.filter(function(r){return !r.persons||!r.persons.length||r.persons.indexOf(p.kods)!==-1;});
   renderResponses('pRespTbody',pResp,app,'p');
   selectedRespIdx.p=-1;
@@ -1085,6 +1137,13 @@ function logGaita(type,note,user){
 }
 
 // ======= TABS =======
+function switchPTab(name){
+  ['raksturojums','lemums','atbildes'].forEach(function(t){
+    document.getElementById('ptab_'+t).className='ctab'+(t===name?' active':'');
+    document.getElementById('ppanel_'+t).className='ctab-panel'+(t===name?' active':'');
+  });
+}
+
 function switchCTab(name){
   ['atteikt','docs','resp','insp','devejs','gaita'].forEach(function(t){
     document.getElementById('ctab_'+t).className='ctab'+(t===name?' active':'');
