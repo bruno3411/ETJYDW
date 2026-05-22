@@ -314,25 +314,51 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
 
           <!-- TAB: Darba devēja raksturojums -->
           <div class="ctab-panel" id="cpanel_devejs">
-            <fieldset class="g" style="border:none;padding:0;">
-              <div style="display:grid;grid-template-columns:160px 120px 160px 140px;gap:4px;align-items:center;margin-bottom:8px;">
-                <span class="rl">Darbinieku skaits</span>
-                <input class="wi" id="devDarbSkaits" style="width:100%;" placeholder="0">
-                <span class="rl">Iemaksas kalendārā gadā</span>
-                <input class="wi" id="devIemaksas" style="width:100%;" placeholder="0.00 EUR">
-                <span class="rl">Nokontētas iemaksas</span>
-                <input class="wi" id="devNokont" style="width:100%;" placeholder="0.00 EUR">
-                <span></span><span></span>
-              </div>
-              <div style="font-weight:bold;font-size:11px;margin-bottom:6px;color:#0a246a;">Iepriekš saņemtie iesniegumi no šī darba devēja:</div>
-              <table class="wt" id="prevAppsTbl">
-                <thead><tr>
-                  <th style="width:80px;">Nr.</th><th style="width:100px;">Datums</th>
-                  <th>Iesnieguma nosaukums</th><th style="width:80px;">Personu sk.</th><th style="width:80px;">Statuss</th>
-                </tr></thead>
-                <tbody id="prevAppsTbody"><tr class="er"><td colspan="5">Nav iepriekšēju iesniegumu</td></tr></tbody>
-              </table>
-            </fieldset>
+
+            <!-- NACE + darbinieku kopskaits -->
+            <div style="display:grid;grid-template-columns:150px 1fr 160px 80px;gap:4px;align-items:center;margin-bottom:6px;">
+              <span class="rl">NACE kods</span>
+              <input class="wi ro" style="width:100%;" value="49.41 — Kravas pārvadājumi pa autoceļiem" readonly>
+              <span class="rl">Darbinieki kopā</span>
+              <input class="wi ro" style="width:100%;" value="87" readonly>
+              <span class="rl">t.sk. administrācijā</span>
+              <input class="wi ro" style="width:140px;" value="12" readonly>
+              <span class="rl">Aktīvie A1</span>
+              <input class="wi ro" style="width:100%;" value="14" readonly>
+              <span class="rl" style="grid-column:1;">Atteiktie A1</span>
+              <input class="wi ro" style="width:100px;" value="3" readonly>
+            </div>
+
+            <hr class="sep">
+
+            <!-- VSAOI ziņojumi par iepriekšējiem 2 mēnešiem -->
+            <div style="font-weight:bold;font-size:11px;margin:4px 0 3px;color:#0a246a;">VSAOI ziņojumi — iepriekšējie 2 mēneši</div>
+            <table class="wt" style="margin-bottom:6px;">
+              <thead><tr>
+                <th style="width:90px;">Mēnesis</th>
+                <th style="width:130px;">Kopējie ienākumi</th>
+                <th style="width:140px;">Aprēķinātais VSAOI</th>
+                <th style="width:130px;">Samaksātais VSAOI</th>
+                <th style="width:100px;">Darbinieku skaits</th>
+              </tr></thead>
+              <tbody>
+                <tr><td>03.2026</td><td>64 820.00 EUR</td><td>18 309.65 EUR</td><td>18 309.65 EUR</td><td>87</td></tr>
+                <tr><td>04.2026</td><td>65 140.00 EUR</td><td>18 399.90 EUR</td><td>17 900.00 EUR</td><td>86</td></tr>
+              </tbody>
+            </table>
+
+            <hr class="sep">
+
+            <!-- Iepriekš saņemtie iesniegumi -->
+            <div style="font-weight:bold;font-size:11px;margin:4px 0 3px;color:#0a246a;">Iepriekš saņemtie iesniegumi no šī darba devēja</div>
+            <table class="wt" id="prevAppsTbl">
+              <thead><tr>
+                <th style="width:80px;">Nr.</th><th style="width:100px;">Datums</th>
+                <th>Iesnieguma nosaukums</th><th style="width:80px;">Personu sk.</th><th style="width:80px;">Statuss</th>
+              </tr></thead>
+              <tbody id="prevAppsTbody"><tr class="er"><td colspan="5">Nav iepriekšēju iesniegumu</td></tr></tbody>
+            </table>
+
           </div>
 
           <!-- TAB: Atteikt -->
@@ -557,8 +583,9 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
           <!-- TAB: Darba ņēmēja raksturojums -->
           <div class="ctab-panel active" id="ppanel_raksturojums">
 
+            <!-- Darba attiecību periodi / amats -->
             <div style="font-weight:bold;font-size:11px;margin:2px 0 3px;color:#0a246a;">Nodarbinātības periodi pie Darba devēja</div>
-            <table class="wt" style="margin-bottom:6px;">
+            <table class="wt" style="margin-bottom:4px;">
               <thead><tr>
                 <th style="width:100px;">Periods no</th>
                 <th style="width:100px;">Periods līdz</th>
@@ -570,21 +597,87 @@ fieldset.g legend{font-size:11px;padding:0 4px;font-weight:bold;background:#d4d0
                 <tr><td>01.01.2025</td><td>31.05.2026</td><td>Šoferis</td><td>Latvija</td></tr>
               </tbody>
             </table>
+            <div style="margin-bottom:6px;">
+              <button class="btn sm" onclick="showInfo('Apdrošināšanas periodi','Apdrošināšanas periodi tiek ielādēti no SAIS...')">Apdrošināšanas periodi</button>
+            </div>
 
             <hr class="sep">
 
-            <div style="font-weight:bold;font-size:11px;margin:5px 0 3px;color:#0a246a;">Iepriekš sagatavotās atbildes par A1 sertifikāta pieprasījumiem</div>
-            <table class="wt">
+            <!-- Uzturēšanās atļauja (trešo valstu pilsoņiem) -->
+            <div style="font-weight:bold;font-size:11px;margin:4px 0 3px;color:#0a246a;">Uzturēšanās atļauja <span style="font-weight:normal;color:#888;">(trešo valstu pilsoņiem)</span></div>
+            <div style="display:grid;grid-template-columns:160px 140px 180px 140px;gap:4px;align-items:center;margin-bottom:6px;">
+              <span class="rl">Atļaujas veids</span>
+              <input class="wi ro" style="width:100%;" value="Pastāvīgā uzturēšanās" readonly>
+              <span class="rl">Derīguma termiņš</span>
+              <input class="wi ro" style="width:100%;" value="31.12.2027" readonly>
+            </div>
+
+            <hr class="sep">
+
+            <!-- Ienākumi un VSAOI — 3 mēneši -->
+            <div style="font-weight:bold;font-size:11px;margin:4px 0 3px;color:#0a246a;">Ienākumi un VSAOI — iepriekšējie 3 mēneši</div>
+            <table class="wt" style="margin-bottom:6px;">
+              <thead><tr>
+                <th style="width:80px;">Mēnesis</th>
+                <th style="width:130px;">Darba alga</th>
+                <th style="width:130px;">Aprēķinātais VSAOI</th>
+                <th style="width:130px;">Samaksātais VSAOI</th>
+                <th>DD</th>
+              </tr></thead>
+              <tbody>
+                <tr><td>02.2026</td><td>1 380.00 EUR</td><td>390.12 EUR</td><td>390.12 EUR</td><td style="font-size:10px;">SIA KREISS</td></tr>
+                <tr><td>03.2026</td><td>1 380.00 EUR</td><td>390.12 EUR</td><td>390.12 EUR</td><td style="font-size:10px;">SIA KREISS</td></tr>
+                <tr><td>04.2026</td><td>1 380.00 EUR</td><td>390.12 EUR</td><td>390.12 EUR</td><td style="font-size:10px;">SIA KREISS</td></tr>
+              </tbody>
+            </table>
+
+            <hr class="sep">
+
+            <!-- Iepriekš izsniegtie A1 — 2 gadi -->
+            <div style="font-weight:bold;font-size:11px;margin:4px 0 3px;color:#0a246a;">Iepriekš izsniegtie A1 sertifikāti — pēdējie 2 gadi</div>
+            <table class="wt" style="margin-bottom:4px;">
               <thead><tr>
                 <th style="width:120px;">Sagatavošanas datums</th>
-                <th style="width:90px;">Dokumenta kods</th>
+                <th style="width:80px;">Kods</th>
                 <th>Nosaukums</th>
               </tr></thead>
               <tbody id="pPrevA1Tbody">
                 <tr><td>15.03.2026</td><td>64501</td><td>A1 sertifikāts — Zviedrija (SE) 01.04.2026–30.09.2026</td></tr>
               </tbody>
             </table>
-            <div style="margin-top:4px;">
+
+            <hr class="sep">
+
+            <!-- Atteiktie A1 — 2 gadi -->
+            <div style="font-weight:bold;font-size:11px;margin:4px 0 3px;color:#0a246a;">Iepriekš atteiktie A1 sertifikāti — pēdējie 2 gadi</div>
+            <table class="wt" style="margin-bottom:4px;">
+              <thead><tr>
+                <th style="width:120px;">Lēmuma datums</th>
+                <th style="width:80px;">Kods</th>
+                <th>Atteikuma iemesls</th>
+              </tr></thead>
+              <tbody>
+                <tr><td>10.02.2026</td><td>2406</td><td>Periods pārsniedz 24 mēnešus — Austrija (AT)</td></tr>
+              </tbody>
+            </table>
+
+            <hr class="sep">
+
+            <!-- Saņemtie A1 no citām dalībvalstīm — 2 gadi -->
+            <div style="font-weight:bold;font-size:11px;margin:4px 0 3px;color:#0a246a;">Saņemtie A1 no citām dalībvalstīm — pēdējie 2 gadi</div>
+            <table class="wt" style="margin-bottom:6px;">
+              <thead><tr>
+                <th style="width:120px;">Periods no</th>
+                <th style="width:120px;">Periods līdz</th>
+                <th style="width:80px;">Valsts</th>
+                <th>Piezīme</th>
+              </tr></thead>
+              <tbody>
+                <tr class="er"><td colspan="4" style="color:#888;font-style:italic;">Nav datu</td></tr>
+              </tbody>
+            </table>
+
+            <div style="margin-top:2px;">
               <button class="btn sm" onclick="viewDocument()">Apskatīt dokumentu</button>
             </div>
 
