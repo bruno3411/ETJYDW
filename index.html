@@ -1,4 +1,195 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guided Tour — A1 Certificate Application System (VSAA / SAIS)</title>
+<style>
+  :root{
+    --teal-deep:#12333f;
+    --teal-mid:#1c4c5c;
+    --teal-glass:rgba(28,76,92,.55);
+    --steel:#ccd4d2;
+    --paper:#e8ecea;
+    --accent:#e0913f;
+    --accent-soft:#f3c98a;
+    --ink:#0e1b1e;
+    --fg:#eaf3f1;
+    --fg-dim:#a9c2bd;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:
+      radial-gradient(1100px 620px at 12% -10%, #1d5468 0%, transparent 60%),
+      radial-gradient(900px 700px at 100% 0%, #123543 0%, transparent 55%),
+      #081a20;
+    font-family:"Segoe UI","Tahoma",Arial,sans-serif;color:var(--fg);min-height:100vh;}
+
+  /* ---------- START SCREEN ---------- */
+  #startScreen{
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:40px 20px;text-align:center;gap:22px;
+  }
+  #startScreen .eyebrow{
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-soft);
+    border:1px solid rgba(224,145,63,.45);padding:5px 14px;border-radius:999px;background:rgba(224,145,63,.08);
+  }
+  #startScreen h1{
+    font-size:clamp(26px,4vw,42px);margin:0;font-weight:700;letter-spacing:-.01em;
+    max-width:820px;line-height:1.15;
+  }
+  #startScreen h1 span{color:var(--accent-soft);}
+  #startScreen p.sub{max-width:620px;color:var(--fg-dim);font-size:15px;line-height:1.6;margin:0;}
+  .mock-peek{
+    width:min(760px,88vw);height:170px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(180deg,#22525f,#173e49);position:relative;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.45);
+  }
+  .mock-peek:before{content:"";position:absolute;top:0;left:0;right:0;height:22px;background:#12333f;border-bottom:1px solid rgba(255,255,255,.08);}
+  .mock-peek:after{content:"A1 sertifikātu iesniegumi";position:absolute;top:3px;left:14px;font-size:11px;color:#bcd8e4;font-weight:700;}
+  .mock-peek .col{position:absolute;top:22px;bottom:0;left:0;width:34%;background:#ccd4d2;border-right:1px solid #8aacaa;}
+  .mock-peek .row{position:absolute;height:12px;left:8px;right:8px;background:#e8ecea;border:1px solid #b9c8c5;border-radius:2px;}
+  #btnStart{
+    margin-top:6px;background:linear-gradient(180deg,var(--accent-soft),var(--accent));
+    color:#241205;border:none;padding:15px 34px;font-size:15px;font-weight:700;border-radius:8px;cursor:pointer;
+    box-shadow:0 10px 30px rgba(224,145,63,.35);letter-spacing:.01em;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  #btnStart:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(224,145,63,.45);}
+  #btnStart:active{transform:translateY(0px);}
+  #startScreen .hint{font-size:12px;color:var(--fg-dim);max-width:480px;}
+  #startScreen .hint b{color:var(--fg);}
+
+  /* ---------- STAGE ---------- */
+  #stage{display:none;flex-direction:column;align-items:center;padding:28px 16px 190px;position:relative;}
+  #topBar{
+    width:min(1220px,96vw);display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;color:var(--fg-dim);font-size:12.5px;
+  }
+  #topBar .title{color:var(--fg);font-weight:700;font-size:14px;letter-spacing:.01em;}
+  #topBar .title span{color:var(--accent-soft);}
+  #frameWrap{
+    position:relative;border-radius:8px;box-shadow:0 26px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06);
+    background:#000;
+  }
+  #appFrame{border:0;display:block;width:1220px;height:760px;max-width:96vw;border-radius:8px;background:#f5f5f5;}
+
+  /* fake cursor */
+  #tourCursor{
+    position:fixed;top:0;left:0;width:30px;height:30px;pointer-events:none;z-index:5000;
+    transform:translate(-4px,-2px);transition:left .68s cubic-bezier(.55,.06,.2,1), top .68s cubic-bezier(.55,.06,.2,1), opacity .25s ease;
+    filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));opacity:0;
+  }
+  #tourCursor svg{display:block;}
+  #clickRipple{
+    position:fixed;top:0;left:0;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;
+    background:radial-gradient(circle, rgba(224,145,63,.9), rgba(224,145,63,0) 70%);
+    pointer-events:none;z-index:4999;opacity:0;
+  }
+  @keyframes ripple{
+    0%{transform:scale(.3);opacity:.9;}
+    100%{transform:scale(3.4);opacity:0;}
+  }
+  #clickRipple.fire{animation:ripple .55s ease-out;}
+
+  /* highlight ring drawn over the iframe */
+  #hiRing{
+    position:fixed;top:0;left:0;width:0;height:0;pointer-events:none;z-index:4998;
+    border-radius:6px;box-shadow:0 0 0 3px var(--accent), 0 0 0 8px rgba(224,145,63,.28), 0 0 24px 4px rgba(224,145,63,.35);
+    transition:left .5s ease, top .5s ease, width .5s ease, height .5s ease, opacity .25s ease;
+    opacity:0;
+  }
+
+  /* ---------- CAPTION BAR ---------- */
+  #captionDock{
+    position:fixed;left:0;right:0;bottom:0;display:none;flex-direction:column;align-items:center;
+    padding:14px 16px 16px;z-index:6000;
+    background:linear-gradient(180deg, rgba(8,26,32,0) 0%, rgba(8,26,32,.85) 28%, rgba(8,26,32,.97) 100%);
+  }
+  #captionCard{
+    width:min(920px,94vw);background:rgba(14,34,40,.92);border:1px solid rgba(224,145,63,.35);
+    border-radius:12px;padding:14px 20px;backdrop-filter:blur(6px);box-shadow:0 12px 40px rgba(0,0,0,.5);
+  }
+  #stepBadge{
+    display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--accent-soft);margin-bottom:6px;font-weight:700;
+  }
+  #stepBadge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  #captionText{font-size:16.5px;line-height:1.5;color:var(--fg);min-height:26px;}
+  #captionText .kw{color:var(--accent-soft);font-weight:700;}
+
+  #controlRow{width:min(920px,94vw);display:flex;align-items:center;gap:10px;margin-top:10px;}
+  .ctlbtn{
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:var(--fg);
+    padding:8px 14px;border-radius:7px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;
+    transition:background .12s ease;white-space:nowrap;font-family:inherit;
+  }
+  .ctlbtn:hover{background:rgba(255,255,255,.16);}
+  .ctlbtn.primary{background:linear-gradient(180deg,var(--accent-soft),var(--accent));color:#241205;border:none;font-weight:700;}
+  .ctlbtn.primary:hover{filter:brightness(1.05);}
+  #progressTrack{flex:1;height:5px;background:rgba(255,255,255,.14);border-radius:99px;overflow:hidden;}
+  #progressFill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-soft),var(--accent));transition:width .35s ease;}
+  #stepCounter{font-size:12px;color:var(--fg-dim);min-width:64px;text-align:right;white-space:nowrap;}
+  #muteLbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--fg-dim);cursor:pointer;white-space:nowrap;}
+
+  @media (prefers-reduced-motion: reduce){
+    #tourCursor,#hiRing{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+  <div class="eyebrow">Guided walkthrough</div>
+  <h1>A1 Certificate Application System <span>— narrated tour</span></h1>
+  <p class="sub">This plays through the actual mockup screen for you: an animated cursor moves, clicks, and types inside the real interface while an English voice-over explains what each part does — the applicant list, the company file, document tabs, the decision workflow, and the intake forms.</p>
+  <div class="mock-peek" aria-hidden="true">
+    <div class="col"></div>
+    <div class="row" style="top:34px;width:26%;left:14px;"></div>
+    <div class="row" style="top:52px;width:26%;left:14px;"></div>
+    <div class="row" style="top:70px;width:26%;left:14px;"></div>
+    <div class="row" style="top:36px;width:56%;left:40%;"></div>
+    <div class="row" style="top:54px;width:56%;left:40%;"></div>
+    <div class="row" style="top:90px;width:56%;left:40%;"></div>
+    <div class="row" style="top:108px;width:56%;left:40%;"></div>
+  </div>
+  <button id="btnStart">▶ Start the guided tour</button>
+  <div class="hint">Turn your sound on. The tour narrates with your browser's built-in <b>English</b> text‑to‑speech voice — no download needed. You can pause, skip, or replay any step from the control bar once it starts.</div>
+</div>
+
+<div id="stage">
+  <div id="topBar">
+    <div class="title">A1 Certificate Application System <span>— guided tour</span></div>
+    <div id="topBarRight">Case-officer walkthrough · VSAA / SAIS mockup</div>
+  </div>
+  <div id="frameWrap">
+    <iframe id="appFrame" title="A1 certificate application mockup"></iframe>
+  </div>
+</div>
+
+<div id="hiRing"></div>
+<div id="clickRipple"></div>
+<div id="tourCursor">
+  <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 2 L4 24 L9.5 19.5 L13 27 L16.5 25.5 L13 18 L21 18 Z" fill="#111820" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<div id="captionDock">
+  <div id="captionCard">
+    <div id="stepBadge"><span class="dot"></span><span id="stepBadgeText">Step</span></div>
+    <div id="captionText"></div>
+  </div>
+  <div id="controlRow">
+    <button class="ctlbtn" id="btnPrev">⏮ Back</button>
+    <button class="ctlbtn primary" id="btnPlayPause">⏸ Pause</button>
+    <button class="ctlbtn" id="btnNext">Next ⏭</button>
+    <div id="progressTrack"><div id="progressFill"></div></div>
+    <div id="stepCounter">0 / 0</div>
+    <label id="muteLbl"><input type="checkbox" id="muteBox"> Mute</label>
+    <button class="ctlbtn" id="btnRestart">⟲ Restart</button>
+  </div>
+</div>
+
+<script>
+const APP_HTML = `<!DOCTYPE html>
 <html lang="lv">
 <head>
 <meta charset="UTF-8">
@@ -309,99 +500,6 @@ fieldset.g legend{
 .icbtn{background:#cad6d4;border:1px solid #9ab8b6;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background 0.1s;}
 .icbtn:hover{background:#b8c8c6;}
 .icbtn:active{background:#a8b8b6;border-color:#7a9896;}
-
-/* ── GUIDED TOUR ── */
-.tour-hl{
-  position:fixed;
-  border-radius:6px;
-  border:2px solid #ffcc00;
-  box-shadow:0 0 0 9999px rgba(8,20,22,0.62), 0 0 0 5px rgba(255,204,0,0.18), 0 0 18px 3px rgba(255,204,0,0.55);
-  pointer-events:none;
-  z-index:999;
-  transition:top 0.25s cubic-bezier(.4,0,.2,1),left 0.25s cubic-bezier(.4,0,.2,1),width 0.25s cubic-bezier(.4,0,.2,1),height 0.25s cubic-bezier(.4,0,.2,1);
-  display:none;
-}
-.tour-tip{
-  position:fixed;
-  z-index:1001;
-  width:340px;
-  background:#ccd4d2;
-  border:1px solid #7eaeac;
-  border-radius:6px;
-  box-shadow:0 4px 18px rgba(0,0,0,0.4);
-  font-family:"Tahoma","Segoe UI",Arial,sans-serif;
-  display:none;
-  opacity:0;
-  transform:translateY(4px);
-  transition:opacity 0.18s ease,transform 0.18s ease;
-  overflow:hidden;
-}
-.tour-tip.show{opacity:1;transform:translateY(0);}
-.tour-tip-hd{
-  background:linear-gradient(135deg,#1c4c5c,#2a6070);
-  color:#e8f4f6;
-  font-weight:bold;
-  font-size:12px;
-  padding:8px 10px 7px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-}
-.tour-tip-hd-title{display:flex;align-items:center;gap:6px;overflow:hidden;}
-.tour-step-badge{
-  background:#ffcc00;color:#1a1c1b;font-size:10px;font-weight:bold;
-  border-radius:50%;width:20px;height:20px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-}
-.tour-tip-group{font-size:9.5px;font-weight:normal;color:#9fc6cf;text-transform:uppercase;letter-spacing:.4px;}
-.tour-tip-bar{height:3px;background:#8aacaa;position:relative;overflow:hidden;}
-.tour-tip-bar-fill{height:100%;background:linear-gradient(90deg,#ffcc00,#ffe08a);transition:width 0.25s ease;}
-.tour-tip-body{padding:11px 12px;font-size:11.5px;line-height:1.55;color:#1a1c1b;max-height:190px;overflow-y:auto;}
-.tour-tip-ft{padding:7px 10px;border-top:1px solid #8aacaa;display:flex;justify-content:space-between;align-items:center;gap:6px;background:#c2ccca;}
-.tour-progress{font-size:10px;color:#3a5a58;white-space:nowrap;}
-.tour-start-btn{position:fixed;bottom:20px;left:20px;z-index:150;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
-
-/* ── TOUR NAV (jump to any step) ── */
-.tour-nav{
-  position:fixed;top:16px;right:0;bottom:16px;
-  width:250px;z-index:998;
-  background:#ccd4d2;border:1px solid #7eaeac;border-right:none;border-radius:6px 0 0 6px;
-  box-shadow:-3px 4px 18px rgba(0,0,0,0.4);
-  display:none;flex-direction:column;
-  transform:translateX(250px);
-  transition:transform 0.22s ease;
-}
-.tour-nav.expanded{transform:translateX(0);}
-.tour-nav-handle{
-  position:absolute;left:-30px;top:50%;transform:translateY(-50%);
-  width:30px;min-height:96px;background:#1c4c5c;border:1px solid #7eaeac;border-right:none;border-radius:6px 0 0 6px;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-  color:#e8f4f6;font-size:10.5px;font-weight:bold;letter-spacing:1px;
-  writing-mode:vertical-rl;text-orientation:mixed;
-  box-shadow:-2px 2px 8px rgba(0,0,0,0.3);
-  user-select:none;padding:8px 0;
-}
-.tour-nav-handle:hover{background:#2a6070;}
-.tour-nav-hd{background:#1c4c5c;color:#bcd8e4;font-weight:bold;font-size:11.5px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:6px;}
-.tour-nav-hd-l{display:flex;align-items:center;gap:6px;overflow:hidden;}
-.tour-nav-close{background:none;border:none;color:#bcd8e4;font-size:13px;font-weight:bold;cursor:pointer;padding:0 2px;flex-shrink:0;}
-.tour-nav-close:hover{color:#fff;}
-.tour-nav-list{overflow-y:auto;flex:1;padding:4px 0;}
-.tour-nav-group-lbl{font-size:9.5px;font-weight:bold;font-style:italic;color:#3a5a58;text-transform:uppercase;letter-spacing:.3px;padding:8px 10px 3px;}
-.tour-nav-item{
-  display:flex;align-items:center;gap:7px;padding:5px 10px;font-size:10.5px;cursor:pointer;
-  color:#1a1c1b;border-left:3px solid transparent;transition:background 0.1s,border-color 0.1s;
-}
-.tour-nav-item:hover{background:#dde8e6;}
-.tour-nav-item.current{background:#c6e2e0;border-left-color:#ffcc00;font-weight:bold;}
-.tour-nav-item.done .tour-nav-num{background:#7eaeac;color:#fff;}
-.tour-nav-num{
-  flex-shrink:0;width:16px;height:16px;border-radius:50%;background:#a6b6b4;color:#1a1c1b;
-  font-size:9px;display:flex;align-items:center;justify-content:center;
-}
-.tour-nav-item.current .tour-nav-num{background:#ffcc00;color:#1a1c1b;}
-.tour-nav-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
 </style>
 </head>
 <body>
@@ -420,7 +518,6 @@ fieldset.g legend{
   <!-- LEFT -->
   <div class="wl">
     <div style="font-weight:bold;padding:2px 0;color:#1c4c5c;">Iesniegumu saraksts</div>
-    <div id="searchFilterBlock">
     <div class="fl"><span style="font-size:10px;white-space:nowrap;color:#3a5a58;">Meklēt:</span>
       <input class="wi" id="searchBox" style="flex:1;font-size:10px;height:18px;" placeholder="Nosaukums / pers.kods..." oninput="renderList()">
     </div>
@@ -429,7 +526,6 @@ fieldset.g legend{
         <option value="">Visi</option><option value="new">Jauns</option>
         <option value="proc">Apstrādē</option><option value="ok">Apstiprināts</option><option value="no">Noraidīts</option><option value="atlikt">Atlikts</option>
       </select>
-    </div>
     </div>
     <div class="lch">
       <span>Iesniegums / Persona</span>
@@ -446,11 +542,11 @@ fieldset.g legend{
       <div class="lg"><span class="sd da"></span><span>Atlikts</span></div>
     </div>
     <hr class="sep">
-    <button class="btn nw fw" id="btnNewApp" onclick="openNewAppModal()">+ Reģistrēt jaunu iesniegumu</button>
+    <button class="btn nw fw" onclick="openNewAppModal()">+ Reģistrēt jaunu iesniegumu</button>
     <hr class="sep">
     <button class="btn fw off" onclick="viewApplication()">Apskatīt iesniegumu</button>
     <button class="btn fw off" style="margin-top:3px;" onclick="viewImage()">Apskatīt e-iesnieguma attēlu</button>
-    <button class="btn pr fw" id="btnRegisterReceivedA1" style="margin-top:3px;" onclick="registerReceivedA1()">Reģistrēt Saņemto A1</button>
+    <button class="btn pr fw" style="margin-top:3px;" onclick="registerReceivedA1()">Reģistrēt Saņemto A1</button>
   </div>
 
   <!-- RIGHT -->
@@ -460,7 +556,7 @@ fieldset.g legend{
     <!-- COMPANY VIEW -->
     <div class="vp" id="companyView">
 
-      <fieldset class="g" id="fieldsetIesniedzejs">
+      <fieldset class="g">
         <legend>Informācija par iesniedzēju</legend>
         <div class="g4" style="margin-top:2px;">
           <span class="rl" id="lblNosaukums">Nosaukums</span><input class="wi ro" id="cNosaukums" style="width:100%;" readonly>
@@ -490,7 +586,7 @@ fieldset.g legend{
         </div>
       </fieldset>
 
-      <fieldset class="g" id="fieldsetIesniegums">
+      <fieldset class="g">
         <legend>Informācija par iesniegumu</legend>
         <table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:11px;">
           <col style="width:155px;"><col><col style="width:145px;"><col>
@@ -621,7 +717,7 @@ fieldset.g legend{
 
           <!-- TAB: Atteikt -->
           <div class="ctab-panel" id="cpanel_atteikt">
-            <div id="atteiktRadioRow" style="padding:4px 0 8px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+            <div style="padding:4px 0 8px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
               <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="atteiktType" value="ddparbaude" checked onchange="switchAtteiktType('ddparbaude')"><span style="color:#1a4a6a;font-weight:bold;">DD pārbaude</span></label>
               <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="atteiktType" value="atlikt" onchange="switchAtteiktType('atlikt')"><span style="color:#6a3a00;font-weight:bold;">⏸ Atlikt apstrādi</span></label>
               <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="atteiktType" value="atteikt" onchange="switchAtteiktType('atteikt')"><span style="color:#6a1a1a;font-weight:bold;">Atteikt iesniegumu</span></label>
@@ -779,7 +875,7 @@ fieldset.g legend{
     <!-- PERSON VIEW -->
     <div class="vp" id="personView">
 
-      <fieldset class="g" id="fieldsetPersonasDati">
+      <fieldset class="g">
         <legend>Personas dati par kuru tiek pieprasīts A1 sertifikāts</legend>
         <table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:11px;">
           <col style="width:130px;"><col><col style="width:130px;"><col>
@@ -979,7 +1075,7 @@ fieldset.g legend{
             <hr class="sep" style="margin:10px 0 6px;">
 
             <div class="sec-t">Sagatavotās atbildes</div>
-            <table class="wt" id="pRespTable"><thead><tr>
+            <table class="wt"><thead><tr>
               <th style="width:150px;">Reģistrācijas numurs</th>
               <th>Dokumenta nosaukums</th>
               <th style="width:90px;">Periods no</th>
@@ -1211,7 +1307,7 @@ fieldset.g legend{
 
 <!-- A1 SERTIFIKĀTA SAGATAVES MODAL -->
 <div class="mo" id="a1SagataveModal">
-  <div class="mw" id="a1SagataveModalBox" style="min-width:700px;max-width:760px;">
+  <div class="mw" style="min-width:700px;max-width:760px;">
     <div class="mt"><span>A1 sertifikāta sagatave — jauna persona</span><button class="tbtn" onclick="closeModal('a1SagataveModal')">✕</button></div>
     <div class="mb" style="max-height:70vh;overflow-y:auto;">
 
@@ -1359,91 +1455,7 @@ fieldset.g legend{
   </div>
 </div>
 
-<button class="btn pr tour-start-btn" id="tourStartBtn" onclick="startTour()">▶ Sākt tūri</button>
-
-<div class="tour-hl" id="tourHl"></div>
-
-<div class="tour-nav" id="tourNav">
-  <div class="tour-nav-handle" id="tourNavHandle" onclick="toggleTourNav()">📍 SOĻI</div>
-  <div class="tour-nav-hd">
-    <div class="tour-nav-hd-l"><span>📍 Visi soļi</span><span class="tour-progress" id="tourNavCount"></span></div>
-    <button class="tour-nav-close" onclick="toggleTourNav(false)">✕</button>
-  </div>
-  <div class="tour-nav-list" id="tourNavList"></div>
-</div>
-
-<div class="tour-tip" id="tourTip">
-  <div class="tour-tip-hd">
-    <div class="tour-tip-hd-title">
-      <span class="tour-step-badge" id="tourStepBadge">1</span>
-      <div>
-        <div id="tourTipTitle">Tūre</div>
-        <div class="tour-tip-group" id="tourTipGroup"></div>
-      </div>
-    </div>
-    <span class="tour-progress" id="tourProgress"></span>
-  </div>
-  <div class="tour-tip-bar"><div class="tour-tip-bar-fill" id="tourBarFill" style="width:0%;"></div></div>
-  <div class="tour-tip-body" id="tourTipBody"></div>
-  <div class="tour-tip-ft">
-    <button class="btn sm pr" onclick="endTour()">✕ Iziet</button>
-    <div style="display:flex;gap:4px;">
-      <button class="btn sm pr" id="tourPrevBtn" onclick="prevTourStep()">◀ Iepr.</button>
-      <button class="btn sm pr" id="tourNextBtn" onclick="nextTourStep()">Tālāk ▶</button>
-    </div>
-  </div>
-</div>
-
 <div class="nt" id="notif"><div class="nt-t" id="ntT"></div><div id="ntX"></div></div>
-
-<!-- ═══════════ AKTUĀLIE JAUTĀJUMI ═══════════ -->
-<div style="width:1180px;min-width:1000px;margin-top:14px;font-family:Tahoma,'MS Sans Serif',Arial,sans-serif;font-size:12px;">
-  <div style="background:#1c4c5c;color:#bcd8e4;font-weight:bold;padding:4px 10px;border-radius:3px 3px 0 0;display:flex;align-items:center;gap:8px;">
-    <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid #bcd8e4;flex-shrink:0;"></div>
-    Aktuālie jautājumi
-  </div>
-  <div style="background:#fff;border:1px solid #8aacaa;border-top:none;border-radius:0 0 3px 3px;padding:12px 16px;">
-    <table style="width:100%;border-collapse:collapse;font-size:12px;">
-      <thead>
-        <tr style="background:#ccd4d2;border-bottom:1px solid #8aacaa;">
-          <th style="padding:5px 8px;text-align:left;width:30px;color:#1a1c1b;font-weight:bold;">#</th>
-          <th style="padding:5px 8px;text-align:left;color:#1a1c1b;font-weight:bold;">Jautājums</th>
-          <th style="padding:5px 8px;text-align:left;width:160px;color:#1a1c1b;font-weight:bold;">Modulis / Ekrānforma</th>
-          <th style="padding:5px 8px;text-align:left;width:120px;color:#1a1c1b;font-weight:bold;">Datums</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr style="border-bottom:1px solid #e4e8e6;">
-          <td style="padding:6px 8px;vertical-align:top;color:#888;font-size:11px;">1</td>
-          <td style="padding:6px 8px;vertical-align:top;">
-            Kā tiek reģistrēta iesnieguma izskatīšanas <b>"atlikšana"</b>?<br>
-            <span style="font-size:11px;color:#555;">Statuss "Atlikts" tiek uzstādīts no šķirkļa "Atlikt / Atteikt iesniegumu" → "Atlikt apstrādi" → poga "Saglabāt". Nepieciešams precizēt: vai jāreģistrē dokuments par termiņa pagarinājumu, vai pietiek ar statusa maiņu?</span>
-          </td>
-          <td style="padding:6px 8px;vertical-align:top;font-size:11px;color:#1c4c5c;">Atlikt / Atteikt iesniegumu</td>
-          <td style="padding:6px 8px;vertical-align:top;font-size:11px;color:#888;">26.05.2026</td>
-        </tr>
-        <tr style="border-bottom:1px solid #e4e8e6;background:#f8f8f8;">
-          <td style="padding:6px 8px;vertical-align:top;color:#888;font-size:11px;">2</td>
-          <td style="padding:6px 8px;vertical-align:top;">
-            Kā reģistrēt <b>pārtraukuma periodu</b>?<br>
-            <span style="font-size:11px;color:#555;">26.05.2026 — jauna ekrānforma "Izsniegtie A1 sertifikāti". Pārtraukuma periods šobrīd tiek pievienots šķirklī "Sagatavotās atbildes" → sadaļa "Pārtraukuma datums". Jāprecizē: vai pārtraukuma periods ir saistāms tieši ar konkrētu izsniegtu A1 sertifikātu?</span>
-          </td>
-          <td style="padding:6px 8px;vertical-align:top;font-size:11px;color:#1c4c5c;">A1 sertifikāti / Sagatavotās atbildes</td>
-          <td style="padding:6px 8px;vertical-align:top;font-size:11px;color:#888;">26.05.2026</td>
-        </tr>
-        <tr style="border-bottom:1px solid #e4e8e6;">
-          <td style="padding:6px 8px;vertical-align:top;color:#888;font-size:11px;">3</td>
-          <td style="padding:6px 8px;vertical-align:top;">
-            Kā reģistrēt <b>saņemto A1 sertifikātu</b> no citas dalībvalsts?<br>
-            <span style="font-size:11px;color:#555;">Šķirklis "A1 sertifikāti" → bloks "Saņemtie A1 sertifikāti" (tabula ar Saņemšanas datums, Periods no, Periods līdz). Jāprecizē ievades mehānisms un vai nepieciešams piesaistīt oriģināldokumentu.</span>
-          </td>
-          <td style="padding:6px 8px;vertical-align:top;font-size:11px;color:#1c4c5c;">A1 sertifikāti</td>
-          <td style="padding:6px 8px;vertical-align:top;font-size:11px;color:#888;">26.05.2026</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
 
 <script>
 var GAITA_TYPES={
@@ -1576,6 +1588,7 @@ function renderList(){
     cnt++;
     var par=document.createElement('div');
     par.className='lpar'+(selApp&&selApp.id===app.id&&viewMode==='company'?' sel':'');
+    par.setAttribute('data-tour','app-row-'+app.id);
     par.innerHTML='<span class="exb" id="exp_'+app.id+'">'+(app.expanded?'&#9660;':'&#9658;')+'</span>'+
       '<span class="ptx" title="'+app.nr+' '+app.date+' '+app.company+'">'+app.nr+' '+app.date+' '+app.company+'</span>'+
       '<span class="pst"><span class="sd '+sDot[app.status]+'"></span></span>'+
@@ -1588,6 +1601,7 @@ function renderList(){
     app.persons.forEach(function(p){
       var ch=document.createElement('div');
       ch.className='lchi'+(selPerson===p?' sel':'');
+      ch.setAttribute('data-tour','person-row-'+p.kods);
       ch.innerHTML='<span class="ctx" title="'+p.kods+' '+p.name+'">'+p.kods+' '+p.name+'</span>'+
         '<span class="cst"><span class="sd '+sDot[p.status]+'"></span></span>'+
         '<span class="cst">'+personDecisionMark(app,p)+'</span>';
@@ -2293,195 +2307,424 @@ function viewLemumsResp(idx){
     'Dokuments tiek ielādēts no arhīva sistēmas...');
 }
 
-/* ═══════════ GUIDED TOUR ═══════════ */
-var tourIdx=-1;
-var tourSteps=[
-  {grp:'Pārskats',sel:'.ww',title:'Laipni lūgti!',text:'Šī ir A1 sertifikātu iesniegumu apstrādes sistēma. Šī tūre soli pa solim parādīs visas funkcijas un pilnu A1 sertifikāta izskatīšanas darba plūsmu. Jebkurā brīdī vari lēkt uz jebkuru soli, izmantojot saraksti pa labi.'},
-  {grp:'Saraksts',sel:'#searchFilterBlock',title:'Meklēšana un filtrs',text:'Meklē pēc iesniedzēja nosaukuma vai personas koda. Filtrē sarakstu pēc statusa (Jauns / Apstrādē / Apstiprināts / Noraidīts / Atlikts).'},
-  {grp:'Saraksts',sel:'.lch',title:'Saraksta kolonnas',text:'"Stat." rāda iesnieguma/personas statusu ar krāsainu punktu. "Lēm." rāda, vai lēmums (sertifikāts vai atteikums) jau ir sagatavots — piemēram "2/3" nozīmē 2 no 3 personām jau ir lēmums.'},
-  {grp:'Saraksts',sel:'.lgr',title:'Statusu apzīmējumi',text:'Krāsu leģenda: zils = Jauns, oranžs = Apstrādē, zaļš = Apstiprināts, sarkans = Noraidīts, violets = Atlikts.'},
-  {grp:'Saraksts',sel:'#mainList',before:function(){selApp=null;selPerson=null;viewMode='empty';renderList();showView('empty');},title:'Iesniegumu saraksts',text:'Katrs iesniegums var saturēt vairākas personas — klikšķini uz bultiņas, lai izvērstu un redzētu personas. Klikšķini uz iesnieguma vai personas, lai atvērtu tā datus labajā pusē.'},
-  {grp:'Iesniedzējs',sel:'#fieldsetIesniedzejs',before:function(){onSelectApp(apps[0]);},title:'Informācija par iesniedzēju',text:'Izvēloties iesniegumu, pa labi redzama iesniedzēja informācija — nosaukums, reģ. numurs, adrese, kontakti, un jauns bloks "Aizliegumi", kas rāda visus reģistrētos darba devēja ierobežojumus neatkarīgi no to termiņa.'},
-  {grp:'Iesniedzējs',sel:'#fieldsetIesniegums',title:'Informācija par iesniegumu',text:'Iesnieguma kods un nosaukums, reģistrācijas dati, personu skaits, neapstrādāto skaits, ISS/SAIS reģistrācijas numuri un lēmuma nosūtīšanas veids (t.sk. jaunā opcija "E-adrese").'},
-  {grp:'Iesnieguma cilnes',sel:'#cTabsBlock',title:'Iesnieguma cilnes',text:'Piecas cilnes pārvalda visu iesnieguma apstrādi: Pievienotie dokumenti, Darba devēja raksturojums, Atlikt/Atteikt iesniegumu, Sagatavotās atbildes, Saņemtie/Nosūtītie dokumenti.'},
-  {grp:'Iesnieguma cilnes',sel:'#cpanel_docs',before:function(){switchCTab('docs');},title:'Pievienotie dokumenti',text:'Visi iesniegumam pievienotie dokumenti. "+ Pievienot reģistrētu dokumentu" reģistrē jau saņemtu dokumentu. Jaunā poga "+ Reģistrēt personu (A1 sagatave)" ļauj manuāli reģistrēt personu no papīra iesnieguma ar pilnu A1 sertifikāta sagataves datu kopu.'},
-  {grp:'Iesnieguma cilnes',sel:'#a1SagataveModalBox',before:function(){openA1SagataveModal();},title:'A1 sertifikāta sagatave',text:'Pilna forma manuālai personas datu ievadei: Personas dati (t.sk. cita valsts ID, dzimtais uzvārds, adreses), Nodarbinātības periods un valstis, Darba devēja dati, Nodarbinātības informācija (% laiks/atalgojums), Nodarbinātības veids un Papildinformācija par A1 saņemšanas veidu.'},
-  {grp:'Iesnieguma cilnes',sel:'#cpanel_devejs',before:function(){closeModal('a1SagataveModal');switchCTab('devejs');},title:'Darba devēja raksturojums',text:'NACE kods, darbinieku skaits, iepriekš izsniegtie/atteiktie A1 sertifikāti un VID iemaksu ziņojuma dati par pēdējiem mēnešiem.'},
-  {grp:'Iesnieguma cilnes',sel:'#atteiktRadioRow',before:function(){switchCTab('atteikt');switchAtteiktType('ddparbaude');},title:'Atlikt / Atteikt iesniegumu',text:'Trīs iespējas visam iesniegumam: DD pārbaude, Atlikt apstrādi vai Atteikt iesniegumu kopumā.'},
-  {grp:'Iesnieguma cilnes',sel:'#ddparbaudeSection',title:'DD pārbaude',text:'Vienkārša tabula, kur reģistrē pārbaudes periodu (sākuma/beigu datums) un pārbaudītāju.'},
-  {grp:'Iesnieguma cilnes',sel:'#atliktSection',before:function(){switchAtteiktType('atlikt');},title:'Atlikt apstrādi',text:'Izvēlas trūkstošo informāciju, ievada termiņu un piezīmes, tad saglabā — iesnieguma statuss kļūst "Atlikts".'},
-  {grp:'Iesnieguma cilnes',sel:'#atteiktSection',before:function(){switchAtteiktType('atteikt');},title:'Atteikt iesniegumu',text:'Atteikuma iemeslu sarakstā iekļauti arī jauni iemesli: "Pašnodarbinātais nav veicis saimniecisko darbību Latvijā" un "Darba devējs neveic būtisku saimniecisko darbību Latvijā". Tiesiskais pamatojums aizpildās automātiski.'},
-  {grp:'Iesnieguma cilnes',sel:'#cpanel_resp',before:function(){switchAtteiktType('ddparbaude');switchCTab('resp');},title:'Sagatavotās atbildes',text:'Visas sagatavotās atbildes (A1 sertifikāti, atteikumi u.c.) šim iesniegumam, sasaistītas ar konkrētām personām.'},
-  {grp:'Iesnieguma cilnes',sel:'#cpanel_lemumi',before:function(){switchCTab('lemumi');},title:'Saņemtie/Nosūtītie dokumenti',text:'Augšā — iepriekšējie iesniegumi no šī paša darba devēja. Apakšā — visi šim iesniegumam nosūtītie dokumenti.'},
-  {grp:'Persona',sel:'#fieldsetPersonasDati',before:function(){switchCTab('docs');onSelectPerson(apps[0],apps[0].persons[0]);},title:'Personas dati',text:'Izvēloties konkrētu personu, redzami tās dati: kods, dzimšanas datums, darba valstis (var atzīmēt vairākas), darba devējs, nodarbinātības statuss un periods.'},
-  {grp:'Persona',sel:'#pTabsBlock',title:'Personas cilnes',text:'Četras cilnes: Darba ņēmēja raksturojums, Lēmums, A1 sertifikāti, Personas informācija.'},
-  {grp:'Persona',sel:'#ppanel_raksturojums',before:function(){switchPTab('raksturojums');},title:'Darba ņēmēja raksturojums',text:'Apdrošināšanas periodi, pazīmes (VID ziņas par darba ņēmēju) un detalizēta iemaksu vēsture par pēdējiem mēnešiem.'},
-  {grp:'Lēmuma pieņemšana',sel:'.rg',before:function(){switchPTab('lemums');},title:'Lēmums — trīs iespējas',text:'Šeit pieņem lēmumu par konkrētu personu: Atlikt (nepieciešama papildu info), Apstiprināt (izsniegt A1) vai Noraidīt.'},
-  {grp:'Lēmuma pieņemšana',sel:'#pendingSection',before:function(){var r=document.querySelector('input[name="decision"][value="pending"]');if(r)r.checked=true;handleDecision('pending');},title:'Atlikt lēmumu',text:'Izvēlas pieprasīto informāciju, ievada termiņu un piezīmes personai — tāpat kā iesnieguma līmenī, bet konkrētai personai.'},
-  {grp:'Lēmuma pieņemšana',sel:'#approveSection',before:function(){var r=document.querySelector('input[name="decision"][value="approve"]');if(r)r.checked=true;handleDecision('approve');},title:'Apstiprināt — A1 sertifikāta izsniegšana',text:'Norāda periodu "no" un "līdz", tad "Sagatavot A1" izveido A1 sertifikātu, atjaunina statusu uz "Apstiprināts" un reģistrē notikumu nosūtīšanai uz RINA.'},
-  {grp:'Lēmuma pieņemšana',sel:'#declineSection',before:function(){var r=document.querySelector('input[name="decision"][value="decline"]');if(r)r.checked=true;handleDecision('decline');},title:'Noraidīt',text:'Iemeslu sarakstā tagad iekļauti arī "Nav darba attiecību" un "Darba devējs neveic būtisku saimniecisko darbību Latvijā". Tiesiskais pamatojums un standarta komentārs par apstrīdēšanas kārtību aizpildās automātiski.'},
-  {grp:'Lēmuma pieņemšana',sel:'#pRespTable',before:function(){var st=selPerson.status==='no'?'decline':selPerson.status==='ok'?'approve':'pending';var r=document.querySelector('input[name="decision"][value="'+st+'"]');if(r)r.checked=true;handleDecision(st);},title:'Sagatavotās atbildes (persona)',text:'Visi šai personai sagatavotie dokumenti — reģistrācijas numurs, periods, pārtraukšanas datums, ja tāds ir.'},
-  {grp:'Persona',sel:'#ppanel_a1sert',before:function(){switchPTab('a1sert');},title:'A1 sertifikāti',text:'Nosūtītie (izsniegtie) un saņemtie (no citām dalībvalstīm) A1 sertifikāti šai personai ar periodiem un pārtraukšanas datumiem.'},
-  {grp:'Persona',sel:'#ppanel_persinfo',before:function(){switchPTab('persinfo');},title:'Personas informācija',text:'Iemaksu objekta dati un uzturēšanās atļauju informācija. Ja persona reģistrēta caur "A1 sagatavi", šeit parādās arī visi papildu ievadītie dati.'},
-  {grp:'Kopsavilkums',sel:'.ww',before:function(){switchPTab('raksturojums');},title:'Pilna darba plūsma — kopsavilkums',text:'1) Reģistrē iesniegumu → 2) izvēlies personu → 3) pieņem lēmumu (Atlikt / Apstiprināt / Noraidīt) → 4) apstiprinot, sagatavo A1 sertifikātu un tas tiek nosūtīts uz RINA → 5) termiņus, kas gaida atbildi no ārvalstu iestādēm, seko līdzi atsevišķajā Termiņkontroles ekrānā. Tūre pabeigta!'}
-];
+<\/script>
+</body>
+</html>
+`;
+/* ============================================================
+   GUIDED TOUR DRIVER
+   Loads the real mockup into the iframe, then drives an
+   animated cursor + highlight ring + English narration through
+   a scripted list of steps, actually clicking / typing inside
+   the live app so the viewer sees real interactions happen.
+   ============================================================ */
 
-function closeAllTourModals(){
-  ['decisionModal','infoModal','newAppModal','regDocModal','newRespModal','addGaitaModal','a1SagataveModal'].forEach(function(id){
-    var m=document.getElementById(id);if(m)m.classList.remove('show');
-  });
-}
+(function(){
 
-function buildTourNav(){
-  var list=document.getElementById('tourNavList');
-  list.innerHTML='';
-  var lastGrp=null;
-  tourSteps.forEach(function(step,i){
-    if(step.grp!==lastGrp){
-      var lbl=document.createElement('div');lbl.className='tour-nav-group-lbl';lbl.textContent=step.grp;
-      list.appendChild(lbl);
-      lastGrp=step.grp;
+  var iframe = document.getElementById('appFrame');
+  var cursor = document.getElementById('tourCursor');
+  var ripple = document.getElementById('clickRipple');
+  var ring = document.getElementById('hiRing');
+  var captionText = document.getElementById('captionText');
+  var stepBadgeText = document.getElementById('stepBadgeText');
+  var stepCounter = document.getElementById('stepCounter');
+  var progressFill = document.getElementById('progressFill');
+  var captionDock = document.getElementById('captionDock');
+  var stage = document.getElementById('stage');
+  var startScreen = document.getElementById('startScreen');
+  var btnStart = document.getElementById('btnStart');
+  var btnPrev = document.getElementById('btnPrev');
+  var btnNext = document.getElementById('btnNext');
+  var btnPlayPause = document.getElementById('btnPlayPause');
+  var btnRestart = document.getElementById('btnRestart');
+  var muteBox = document.getElementById('muteBox');
+
+  var iwin, idoc;
+  var playing = false;
+  var currentStep = -1;
+  var advanceTimer = null;
+  var currentUtterance = null;
+  var runToken = 0; // increments every time we (re)start a step, to cancel stale async callbacks
+
+  /* ---------- Build the iframe from the embedded source ---------- */
+  function bootFrame(cb){
+    iframe.srcdoc = APP_HTML;
+    iframe.addEventListener('load', function onload(){
+      iframe.removeEventListener('load', onload);
+      iwin = iframe.contentWindow;
+      idoc = iframe.contentDocument;
+      cb();
+    });
+  }
+
+  /* ---------- Voice ---------- */
+  var chosenVoice = null;
+  function pickVoice(){
+    var voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+    if(!voices || !voices.length) return;
+    var pref = voices.find(function(v){ return /en-US|en_US/i.test(v.lang) && /Google|Microsoft|Natural/i.test(v.name); });
+    if(!pref) pref = voices.find(function(v){ return /^en/i.test(v.lang) && /Google/i.test(v.name); });
+    if(!pref) pref = voices.find(function(v){ return /^en/i.test(v.lang); });
+    chosenVoice = pref || voices[0];
+  }
+  if(window.speechSynthesis){
+    pickVoice();
+    window.speechSynthesis.onvoiceschanged = pickVoice;
+  }
+
+  function speak(text, onEnd){
+    if(!window.speechSynthesis || muteBox.checked){
+      // no speech available / muted: just wait a bit based on text length
+      var ms = Math.max(1800, Math.min(9000, text.length * 55));
+      advanceTimer = setTimeout(onEnd, ms);
+      return;
     }
-    var item=document.createElement('div');
-    item.className='tour-nav-item';
-    item.id='tourNavItem_'+i;
-    item.innerHTML='<span class="tour-nav-num">'+(i+1)+'</span><span class="tour-nav-txt">'+step.title+'</span>';
-    item.addEventListener('click',function(){jumpToTourStep(i);});
-    list.appendChild(item);
-  });
-  document.getElementById('tourNavCount').textContent=tourSteps.length+' soļi';
-}
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    if(chosenVoice) u.voice = chosenVoice;
+    u.lang = 'en-US';
+    u.rate = 1.0;
+    u.pitch = 1.0;
+    currentUtterance = u;
+    var done = false;
+    var finish = function(){
+      if(done) return; done = true;
+      onEnd();
+    };
+    u.onend = finish;
+    u.onerror = finish;
+    // safety fallback in case onend never fires (some browsers on hidden tabs)
+    advanceTimer = setTimeout(finish, Math.max(3000, Math.min(16000, text.length * 90)));
+    window.speechSynthesis.speak(u);
+  }
 
-function updateTourNavHighlight(){
-  tourSteps.forEach(function(step,i){
-    var item=document.getElementById('tourNavItem_'+i);
-    if(!item)return;
-    item.className='tour-nav-item'+(i===tourIdx?' current':(i<tourIdx?' done':''));
-  });
-  var current=document.getElementById('tourNavItem_'+tourIdx);
-  if(current)current.scrollIntoView({block:'nearest'});
-}
+  /* ---------- Geometry helpers ---------- */
+  function frameOffset(){
+    var r = iframe.getBoundingClientRect();
+    return {left:r.left, top:r.top};
+  }
+  function elRectInPage(el){
+    var r = el.getBoundingClientRect();
+    var off = frameOffset();
+    return {
+      left: r.left + off.left, top: r.top + off.top,
+      width: r.width, height: r.height,
+      cx: r.left + off.left + r.width/2, cy: r.top + off.top + r.height/2
+    };
+  }
 
-function startTour(){
-  document.getElementById('tourStartBtn').style.display='none';
-  buildTourNav();
-  var nav=document.getElementById('tourNav');
-  nav.style.display='flex';
-  nav.classList.remove('expanded');
-  tourIdx=0;
-  showTourStep();
-}
+  function qs(sel){
+    try{ return idoc.querySelector(sel); }catch(e){ return null; }
+  }
 
-function toggleTourNav(force){
-  var nav=document.getElementById('tourNav');
-  var show=(force!==undefined)?force:!nav.classList.contains('expanded');
-  nav.classList.toggle('expanded',show);
-}
+  function scrollIntoViewIfNeeded(el){
+    try{
+      var r = el.getBoundingClientRect();
+      var vh = iframe.clientHeight, vw = iframe.clientWidth;
+      if(r.top < 40 || r.bottom > vh - 20 || r.left < 0 || r.right > vw){
+        el.scrollIntoView({block:'center', inline:'nearest'});
+      }
+    }catch(e){}
+  }
 
-function endTour(){
-  tourIdx=-1;
-  closeAllTourModals();
-  document.getElementById('tourHl').style.display='none';
-  document.getElementById('tourTip').classList.remove('show');
-  document.getElementById('tourTip').style.display='none';
-  var nav=document.getElementById('tourNav');
-  nav.classList.remove('expanded');
-  nav.style.display='none';
-  document.getElementById('tourStartBtn').style.display='inline-flex';
-  selApp=null;selPerson=null;viewMode='empty';
-  switchCTab('docs');switchPTab('raksturojums');switchAtteiktType('ddparbaude');
-  renderList();showView('empty');
-}
+  function moveCursorTo(x, y, cb){
+    cursor.style.opacity = '1';
+    cursor.style.left = x + 'px';
+    cursor.style.top = y + 'px';
+    if(cb) setTimeout(cb, 700);
+  }
 
-function nextTourStep(){
-  if(tourIdx>=tourSteps.length-1){endTour();return;}
-  tourIdx++;showTourStep();
-}
-function prevTourStep(){
-  if(tourIdx<=0)return;
-  tourIdx--;showTourStep();
-}
-function jumpToTourStep(i){
-  if(i<0||i>=tourSteps.length)return;
-  tourIdx=i;showTourStep();
-}
+  function fireRipple(x, y){
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    ripple.classList.remove('fire');
+    void ripple.offsetWidth;
+    ripple.classList.add('fire');
+    ripple.style.opacity = '1';
+  }
 
-function showTourStep(){
-  closeAllTourModals();
-  var step=tourSteps[tourIdx];
-  if(!step){endTour();return;}
-  document.getElementById('tourTip').classList.remove('show');
-  if(step.before){try{step.before();}catch(e){}}
-  updateTourNavHighlight();
-  setTimeout(function(){positionTourStep(step);},60);
-}
+  function showRing(rect, pad){
+    pad = pad == null ? 6 : pad;
+    ring.style.left = (rect.left - pad) + 'px';
+    ring.style.top = (rect.top - pad) + 'px';
+    ring.style.width = (rect.width + pad*2) + 'px';
+    ring.style.height = (rect.height + pad*2) + 'px';
+    ring.style.opacity = '1';
+  }
+  function hideRing(){ ring.style.opacity = '0'; }
 
-function positionTourStep(step){
-  var target=document.querySelector(step.sel);
-  var hl=document.getElementById('tourHl');
-  var tip=document.getElementById('tourTip');
-  if(!target){
-    hl.style.display='none';
-    positionTipFallback(tip);
-  } else {
-    var inModal=!!target.closest('.mo.show');
-    target.scrollIntoView({block:'center',inline:'center'});
+  function clickInFrame(el){
+    try{
+      el.dispatchEvent(new iwin.MouseEvent('mousedown', {bubbles:true, cancelable:true, view:iwin}));
+      el.dispatchEvent(new iwin.MouseEvent('mouseup',   {bubbles:true, cancelable:true, view:iwin}));
+      el.click();
+    }catch(e){ try{ el.click(); }catch(e2){} }
+  }
+
+  function typeInFrame(el, text, cb){
+    el.focus();
+    var i = 0;
+    el.value = '';
+    (function step(){
+      if(i <= text.length){
+        el.value = text.slice(0, i);
+        el.dispatchEvent(new iwin.Event('input', {bubbles:true}));
+        i++;
+        setTimeout(step, 38);
+      } else {
+        el.dispatchEvent(new iwin.Event('change', {bubbles:true}));
+        if(cb) setTimeout(cb, 150);
+      }
+    })();
+  }
+
+  /* ============================================================
+     STEP SCRIPT
+     Each step: { sel, text, action, pad, wait }
+       sel:    CSS selector inside the iframe (or null = whole window)
+       text:   narration caption (English)
+       action: 'highlight' | 'click' | 'type' | 'radio' | 'none'
+       value:  text to type (for action:'type')
+       pad:    highlight padding override
+     ============================================================ */
+  var STEPS = [
+    { sel: '.ww', pad: 2,
+      text: 'Welcome. This is the A1 Certificate Application screen used by VSAA case officers to process posted‑worker submissions. On the left is a list of every application; on the right is the full case file. Let\u2019s walk through it.' , action:'highlight'},
+
+    { sel: '#searchBox', action:'highlight',
+      text: 'The search box filters the list instantly, by company name or by a person\u2019s personal code.' },
+
+    { sel: '#statusFilter', action:'highlight',
+      text: 'This dropdown filters by status: New, Processing, Approved, Rejected, or Postponed \u2014 matching the colored dots you see next to every row.' },
+
+    { sel: '[data-tour="app-row-A001"]', action:'click', pad:2,
+      text: 'Let\u2019s open a case. Clicking an application row \u2014 this one from SIA KREISS \u2014 loads its full file on the right.' },
+
+    { sel: '#cNosaukums', action:'highlight',
+      text: 'The Applicant Information panel shows the company name, registration number, legal address, and contact details, pulled straight from the registry.' },
+
+    { sel: '#cAizliegumiTbody', action:'highlight',
+      text: 'Any active restriction on the employer \u2014 for example a tax debt flag from the State Revenue Service \u2014 shows up here, so problems are caught before a certificate is ever issued.' },
+
+    { sel: '#cAppFullTitle', action:'highlight',
+      text: 'The Application Information block records which submission type this is, its registration numbers, and how the eventual decision should be delivered back to the applicant.' },
+
+    { sel: '#ctab_docs', action:'click',
+      text: 'The Documents tab lists every file attached to the submission \u2014 employment contracts, secondment letters, and any supporting evidence.' },
+
+    { sel: '[onclick="openA1SagataveModal()"]', action:'click',
+      text: 'To add a new person to this application, the officer clicks \u201cRegister person, A1 template,\u201d which opens a detailed intake form.' },
+
+    { sel: '#sgPeriodsNo', action:'highlight', pad:4,
+      text: 'That form captures identity, employer, and the exact planned work period \u2014 plus every EU, EEA, Swiss, or UK country the assignment touches.' },
+
+    { sel: null, action:'closeModal:a1SagataveModal',
+      text: 'We\u2019ll close this intake form for now and keep exploring the tabs.' },
+
+    { sel: '#ctab_devejs', action:'click',
+      text: 'The Employer Profile tab shows the company\u2019s industry code, staff counts, and its two most recent social‑contribution reports \u2014 key evidence that the employer genuinely operates in Latvia.' },
+
+    { sel: '#ctab_atteikt', action:'click',
+      text: 'Postpone or Decline is where the officer runs a compliance check on the employer, postpones the case pending more documents, or issues a formal rejection.' },
+
+    { sel: 'input[name="atteiktType"][value="atteikt"]', action:'click',
+      text: 'Switching to \u201cReject application\u201d reveals a reason dropdown.' },
+
+    { sel: '#atteiktReason', action:'highlight',
+      text: 'Choosing a rejection reason here automatically fills in the matching legal article, so every decision stays consistently justified.' },
+
+    { sel: '#ctab_resp', action:'click',
+      text: 'Prepared Responses lists every document already generated and sent out for this submission, with its registration number and recipient.' },
+
+    { sel: '#ctab_lemumi', action:'click',
+      text: 'Received and Sent Documents shows this employer\u2019s history with VSAA: earlier submissions on the left, and every certificate issued or refused on the right.' },
+
+    { sel: '#exp_A001', action:'click',
+      text: 'Back on the left, clicking the small arrow expands the list of people covered by this one application.' },
+
+    { sel: '[data-tour="person-row-291011-12345"]', action:'click',
+      text: 'Now let\u2019s open one specific person\u2019s file \u2014 clicking a name loads that individual\u2019s own case.' },
+
+    { sel: '#pPersona', action:'highlight',
+      text: 'The Person view opens with identity: full name, personal code, date of birth, the destination country, the employer, employment status, and the requested period.' },
+
+    { sel: '#pValstsList', action:'highlight',
+      text: 'Every EU or EEA country involved in this person\u2019s assignment is checked off in this grid.' },
+
+    { sel: '#ptab_raksturojums', action:'click',
+      text: 'The Employee Profile tab shows this person\u2019s insurance periods and recent contribution history \u2014 used to confirm continuous Latvian social‑insurance coverage before any certificate is granted.' },
+
+    { sel: '#ptab_lemums', action:'click',
+      text: 'This is the heart of the workflow: the Decision tab.' },
+
+    { sel: 'input[name="decision"][value="approve"]', action:'click',
+      text: 'Choosing Approve reveals a date range \u2014 the officer sets exactly which period the certificate will cover before generating it.' },
+
+    { sel: '#approveDateFrom', action:'highlight',
+      text: 'Approving here would prepare and send the A1 certificate straight to the applicant.' },
+
+    { sel: 'input[name="decision"][value="decline"]', action:'click',
+      text: 'Switching to Reject asks for a reason \u2014 just like at company level, the legal basis fills in automatically once one is chosen.' },
+
+    { sel: '#declineReason', action:'highlight',
+      text: 'This keeps every rejection letter grounded in the correct article of EU Regulation 883/2004 or Latvian law.' },
+
+    { sel: '#ptab_a1sert', action:'click',
+      text: 'The A1 Certificates tab keeps a record of every certificate sent to this person, plus any certificate received back from another member state confirming reciprocal coverage.' },
+
+    { sel: '#ptab_persinfo', action:'click',
+      text: 'Finally, Person Information holds the underlying contribution amounts and any residence‑permit data used to support the case.' },
+
+    { sel: '[onclick="openNewAppModal()"]', action:'click',
+      text: 'Back at the top of the list, \u201cRegister new application\u201d opens a short form for logging a brand‑new submission by hand \u2014 company details, submission type, and how it was received.' },
+
+    { sel: '#naType', action:'highlight',
+      text: 'The submission type drives everything downstream, since each of these five VSAA form codes maps to a different A1 scenario \u2014 posted worker, self‑employed, or multi‑state work.' },
+
+    { sel: null, action:'closeModal:newAppModal',
+      text: 'And that\u2019s the full tour: the applicant list, the company case file with its five tabs, the person‑level decision workflow, and the intake forms behind it all. Feel free to replay any part using the controls below.' }
+  ];
+
+  /* ---------- Modal helpers reached via iframe window ---------- */
+  function closeModalByName(name){
+    try{ iwin.closeModal(name); }catch(e){}
+  }
+
+  /* ---------- Render caption / progress chrome ---------- */
+  function renderChrome(i){
+    var n = STEPS.length;
+    stepBadgeText.textContent = 'Step ' + (i+1) + ' of ' + n;
+    stepCounter.textContent = (i+1) + ' / ' + n;
+    progressFill.style.width = (((i+1)/n) * 100) + '%';
+    captionText.textContent = STEPS[i].text;
+  }
+
+  /* ---------- Run one step ---------- */
+  function runStep(i){
+    if(i < 0 || i >= STEPS.length) return;
+    currentStep = i;
+    var myToken = ++runToken;
+    var step = STEPS[i];
+    renderChrome(i);
+
+    function proceedAfterSpeech(){
+      speak(step.text, function(){
+        if(myToken !== runToken) return;
+        if(playing) advanceTimer = setTimeout(function(){
+          if(myToken === runToken && playing) runStep(i+1);
+        }, 260);
+      });
+    }
+
+    // Actions that don't target a visible element
+    if(step.action && step.action.indexOf('closeModal:') === 0){
+      hideRing();
+      cursor.style.opacity = '0';
+      closeModalByName(step.action.split(':')[1]);
+      proceedAfterSpeech();
+      return;
+    }
+
+    var el = step.sel ? qs(step.sel) : idoc.querySelector('.ww');
+    if(!el){
+      // element not found (e.g. modal not open yet) — just narrate
+      hideRing();
+      proceedAfterSpeech();
+      return;
+    }
+
+    scrollIntoViewIfNeeded(el);
+
     setTimeout(function(){
-      var r=target.getBoundingClientRect();
-      hl.style.display='block';
-      hl.style.top=(r.top-4)+'px';
-      hl.style.left=(r.left-4)+'px';
-      hl.style.width=(r.width+8)+'px';
-      hl.style.height=(r.height+8)+'px';
-      positionTip(tip,r,inModal);
-    },50);
+      if(myToken !== runToken) return;
+      var rect = elRectInPage(el);
+      showRing(rect, step.pad);
+      moveCursorTo(rect.cx, rect.cy, function(){
+        if(myToken !== runToken) return;
+        if(step.action === 'click'){
+          fireRipple(rect.cx, rect.cy);
+          setTimeout(function(){
+            if(myToken !== runToken) return;
+            clickInFrame(el);
+            setTimeout(proceedAfterSpeech, 120);
+          }, 160);
+        } else if(step.action === 'type'){
+          fireRipple(rect.cx, rect.cy);
+          typeInFrame(el, step.value || '', proceedAfterSpeech);
+        } else {
+          proceedAfterSpeech();
+        }
+      });
+    }, 60);
   }
-  document.getElementById('tourStepBadge').textContent=(tourIdx+1);
-  document.getElementById('tourTipTitle').textContent=step.title;
-  document.getElementById('tourTipGroup').textContent=step.grp;
-  document.getElementById('tourTipBody').textContent=step.text;
-  document.getElementById('tourProgress').textContent=(tourIdx+1)+' / '+tourSteps.length;
-  document.getElementById('tourBarFill').style.width=Math.round(((tourIdx+1)/tourSteps.length)*100)+'%';
-  document.getElementById('tourPrevBtn').disabled=(tourIdx===0);
-  document.getElementById('tourNextBtn').textContent=(tourIdx===tourSteps.length-1)?'Pabeigt ✔':'Tālāk ▶';
-  tip.style.display='block';
-  requestAnimationFrame(function(){tip.classList.add('show');});
-}
 
-function positionTip(tip,r,inModal){
-  var vw=window.innerWidth,vh=window.innerHeight;
-  var navEl=document.getElementById('tourNav');
-  var navExpanded=navEl&&navEl.classList.contains('expanded');
-  var navLeft=navExpanded?navEl.getBoundingClientRect().left:vw;
-  var tw=340,th=tip.offsetHeight||220;
-  var maxRight=Math.min(vw-10,navLeft-10);
-  var top,left;
-  if(inModal){
-    /* Modal steps: place tooltip beside the modal, never over it */
-    top=r.top+(r.height/2)-(th/2);
-    top=Math.max(10,Math.min(top,vh-th-10));
-    if(r.left-tw-20>=10){
-      left=r.left-tw-20;
-    } else if(r.right+20+tw<=maxRight){
-      left=r.right+20;
-    } else {
-      left=Math.max(10,maxRight-tw);
-      top=Math.max(10,r.top-th-14);
-    }
-  } else {
-    top=r.bottom+14;
-    if(top+th>vh-10)top=Math.max(10,r.top-th-14);
-    left=r.left;
-    if(left+tw>maxRight)left=maxRight-tw;
-    if(left<10)left=10;
+  function stopTimers(){
+    if(advanceTimer){ clearTimeout(advanceTimer); advanceTimer = null; }
+    if(window.speechSynthesis) window.speechSynthesis.cancel();
+    runToken++; // invalidate any in-flight callbacks
   }
-  tip.style.top=top+'px';
-  tip.style.left=left+'px';
-}
-function positionTipFallback(tip){
-  tip.style.top='80px';
-  tip.style.left=(window.innerWidth/2-170)+'px';
-}
+
+  function goTo(i){
+    stopTimers();
+    if(i < 0) i = 0;
+    if(i >= STEPS.length) i = STEPS.length - 1;
+    runStep(i);
+  }
+
+  function setPlaying(p){
+    playing = p;
+    btnPlayPause.textContent = playing ? '\u23F8 Pause' : '\u25B6 Play';
+    if(playing){
+      // resume from current step's narration
+      goTo(currentStep < 0 ? 0 : currentStep);
+    } else {
+      stopTimers();
+    }
+  }
+
+  /* ---------- Controls ---------- */
+  btnNext.addEventListener('click', function(){
+    playing = true; btnPlayPause.textContent = '\u23F8 Pause';
+    goTo((currentStep < 0 ? 0 : currentStep) + 1);
+  });
+  btnPrev.addEventListener('click', function(){
+    playing = true; btnPlayPause.textContent = '\u23F8 Pause';
+    goTo((currentStep < 0 ? 0 : currentStep) - 1);
+  });
+  btnPlayPause.addEventListener('click', function(){
+    setPlaying(!playing);
+  });
+  btnRestart.addEventListener('click', function(){
+    playing = true; btnPlayPause.textContent = '\u23F8 Pause';
+    // rebuild the iframe fresh so all demo edits (new rows etc.) reset
+    stopTimers();
+    bootFrame(function(){ goTo(0); });
+  });
+  muteBox.addEventListener('change', function(){
+    if(window.speechSynthesis) window.speechSynthesis.cancel();
+  });
+
+  /* ---------- Start ---------- */
+  btnStart.addEventListener('click', function(){
+    startScreen.style.display = 'none';
+    stage.style.display = 'flex';
+    captionDock.style.display = 'flex';
+    // unlock speech synthesis with a tiny silent utterance inside this user gesture
+    if(window.speechSynthesis){
+      try{
+        var warm = new SpeechSynthesisUtterance(' ');
+        warm.volume = 0;
+        window.speechSynthesis.speak(warm);
+      }catch(e){}
+    }
+    bootFrame(function(){
+      playing = true;
+      btnPlayPause.textContent = '\u23F8 Pause';
+      setTimeout(function(){ goTo(0); }, 350);
+    });
+  });
+
+})();
 
 </script>
 </body>
